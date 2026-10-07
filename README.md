@@ -57,8 +57,11 @@ Glassify is spoti.pw's GPL-3.0 code, with:
   of the player, with the background colours following it and a crossfade as you swipe the player down.
   Choose and order the sources on the Now playing page; Apple Music comes first by default.
 - **Animated lock screen artwork** from the same sources, in an order of its own on the Lock screen
-  widget page, with the next
-  track's clip fetched ahead so it starts as the song does.
+  widget page, with the next track's clip fetched ahead so it starts as the song does.
+- **Animated album covers**: an album, EP or single page plays its Apple Music motion cover at the top,
+  where there is one.
+- **Pull to zoom** on album and artist pages: pulled down past the top, the picture stays pinned to the
+  top of the screen and grows, as in Apple Music.
 - **Artist logos** from Apple Music in place of the name on artist pages, where one exists.
 - **Spicy Lyrics** as a lyrics source: the community's word-by-word syncs, then Apple Music's and
   Spotify's. Bring your own free publishable key from
@@ -71,7 +74,8 @@ Glassify is spoti.pw's GPL-3.0 code, with:
 - A black fade behind the Home and Library headers, so content scrolling under the title fades out
   instead of showing through it, and more room between Home's title and its tiles.
 - Fixes: the player's footer row when a song was shared by a friend ("From …"), a doubled tab bar and a
-  missing selected tab while swiping the player down.
+  missing selected tab while swiping the player down, and a live cover that froze after Notification
+  Centre or Control Centre was opened over it.
 
 **Removed**
 
@@ -79,8 +83,8 @@ Glassify is spoti.pw's GPL-3.0 code, with:
   links to spoti.pw's site, Discord and GitHub.
 
 spoti.pw's own animated lock screen artwork arrived after its license change and is not part of
-Glassify. The lock screen artwork, live cover and artist logos here were written independently, without
-reference to that code.
+Glassify. The lock screen artwork, live cover, animated album covers and artist logos here were written
+independently, without reference to that code.
 
 ## Build it
 

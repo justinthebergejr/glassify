@@ -128,6 +128,12 @@ static UIView *containerOf(UIView *header) {
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
+- (void)didMoveToWindow {
+    [super didMoveToWindow];
+    // Pulled down past the top of the page, the photo stays on the top of the screen and grows.
+    SGRStretchOnPull(self);
+}
+
 - (void)sgr_fieldColorDidChange {
     if (self.superview) self.fieldColor = SGRArtistFieldColor(self);
 }
@@ -216,7 +222,8 @@ static void applyHero(UIView *container, UIView *artwork, CGFloat bottom) {
         SGLog(@"redesign artist: hero %.0fpt across the top of the page", height);
     }
     if (height < kMinHero) return;
-    setFrame(hero, CGRectMake(0, 0, container.bounds.size.width, height));
+    SGRPlaceStretched(hero, CGRectMake(0, 0, container.bounds.size.width, height));
+    SGRStretchOnPull(hero);
     hero.fieldColor = SGRArtistFieldColor(container);
     [hero followArtwork:photoIn(artwork)];
 }

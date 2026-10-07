@@ -24,6 +24,7 @@
 // Play and shuffle are not in the header. The album page floats them over the page, pinned to the top
 // trailing corner outside the scroll (01.txt:1431, :1436): they are concealed where they are, and the row
 // draws them and fires them all the same.
+#import <AVFoundation/AVFoundation.h>
 #import "Core/SGCore.h"
 #import "Redesigned/Kit/SGRKit.h"
 #import "Album.h"
@@ -119,11 +120,20 @@ static void watch(UIView *view, const void *key, void (^laidOut)(UIView *view)) 
 // The cover in Spotify's artwork view, and every cover it puts there afterwards: the hero keeps itself
 // right, rather than being handed a picture on each of the header's passes and staying empty between them.
 - (void)followCover:(UIImageView *)source;
+// The album's motion cover over the still one, once it is in (AlbumMotion.m); asked once per album.
+- (void)playMotionOf:(NSString *)artist album:(NSString *)album;
 @end
 
 @implementation SGRAlbumHero {
     CAGradientLayer *_scrim, *_dissolve;
     __weak UIImageView *_cover;
+    // The motion cover: a looping muted player over the picture, faded in on its first frame and held on
+    // its frame while the page is off screen, the app is not active, or Reduce Motion is on.
+    UIView *_motion;
+    AVPlayerLayer *_video;
+    AVQueuePlayer *_player;
+    AVPlayerLooper *_looper;
+    NSString *_motionAsked;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -137,6 +147,20 @@ static void watch(UIView *view, const void *key, void (^laidOut)(UIView *view)) 
     _picture.clipsToBounds = YES;
     _picture.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:_picture];
+
+    _motion = [[UIView alloc] initWithFrame:self.bounds];
+    _motion.userInteractionEnabled = NO;
+    _motion.alpha = 0;
+    _motion.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _video = [AVPlayerLayer layer];
+    _video.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    [_motion.layer addSublayer:_video];
+    [self addSubview:_motion];
+    [_video addObserver:self forKeyPath:@"readyForDisplay" options:0 context:NULL];
+    for (NSNotificationName name in @[UIApplicationDidBecomeActiveNotification, UIApplicationWillResignActiveNotification,
+                                      UIAccessibilityReduceMotionStatusDidChangeNotification]) {
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(sgr_restartMotion) name:name object:nil];
+    }
 
     _scrim = [CAGradientLayer layer];
     _scrim.zPosition = 1;
@@ -154,7 +178,66 @@ static void watch(UIView *view, const void *key, void (^laidOut)(UIView *view)) 
 }
 
 - (void)dealloc {
+    [_video removeObserver:self forKeyPath:@"readyForDisplay"];
+    [_looper disableLooping];
+    [_player pause];
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)playMotionOf:(NSString *)artist album:(NSString *)album {
+    if (!artist.length || !album.length) return;
+    NSString *asked = [NSString stringWithFormat:@"%@\n%@", artist, album];
+    if ([asked isEqualToString:_motionAsked]) return;
+    _motionAsked = asked;
+    __weak SGRAlbumHero *weakSelf = self;
+    SGRAlbumMotionClip(artist, album, ^(NSURL *file) {
+        SGRAlbumHero *hero = weakSelf;
+        if (file && [hero->_motionAsked isEqualToString:asked]) [hero startMotion:file];
+    });
+}
+
+- (void)startMotion:(NSURL *)file {
+    [_looper disableLooping];
+    [_player pause];
+    _player = [AVQueuePlayer queuePlayerWithItems:@[]];
+    _player.muted = YES;
+    _player.preventsDisplaySleepDuringVideoPlayback = NO;
+    _player.audiovisualBackgroundPlaybackPolicy = AVPlayerAudiovisualBackgroundPlaybackPolicyPauses;
+    _looper = [AVPlayerLooper playerLooperWithPlayer:_player templateItem:[AVPlayerItem playerItemWithURL:file]];
+    _video.player = _player;
+    [self applyMotionRate];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (object != _video) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!self->_video.readyForDisplay || self->_motion.alpha > 0) return;
+        SGRAnimate(SGRMotionFade, ^{ self->_motion.alpha = 1; }, nil);
+    });
+}
+
+- (void)didMoveToWindow {
+    [super didMoveToWindow];
+    // Pulled down past the top of the page, the cover stays on the top of the screen and grows.
+    SGRStretchOnPull(self);
+    [self applyMotionRate];
+}
+
+- (void)applyMotionRate {
+    BOOL moving = self.window && !SGRReduceMotion()
+                  && UIApplication.sharedApplication.applicationState == UIApplicationStateActive;
+    if (moving) [_player play];
+    else [_player pause];
+}
+
+// Notification Centre or Control Centre over the app pauses the video without saying so, and the player can
+// go on claiming to play over a frozen frame, so coming back pauses it first and starts it again.
+- (void)sgr_restartMotion {
+    [_player pause];
+    [self applyMotionRate];
 }
 
 - (void)sgr_fieldColorDidChange {
@@ -180,6 +263,7 @@ static void watch(UIView *view, const void *key, void (^laidOut)(UIView *view)) 
     CGRect bounds = self.bounds;
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
+    _video.frame = _motion.bounds;
     _scrim.frame = CGRectMake(0, 0, bounds.size.width, MIN(kTopScrim, bounds.size.height));
     CGFloat fade = round(bounds.size.height * kDissolve);
     _dissolve.frame = CGRectMake(0, bounds.size.height - fade, bounds.size.width, fade);
@@ -250,7 +334,8 @@ static void applyHero(UIView *header, UIView *cover, CGFloat bottom) {
         SGLog(@"redesign album: hero %.0fpt across the top of the header", height);
     }
     if (height < kMinHero) return;
-    setFrame(hero, CGRectMake(0, 0, header.bounds.size.width, height));
+    SGRPlaceStretched(hero, CGRectMake(0, 0, header.bounds.size.width, height));
+    SGRStretchOnPull(hero);
     hero.fieldColor = SGRAlbumFieldColor(header);
 
     [hero followCover:coverImageIn(cover)];
@@ -436,6 +521,11 @@ static void applyHeader(UIView *header, UIView *page) {
     CGFloat bottom = rest - SGRHeaderInfoBottom - [info contentHeightForWidth:header.bounds.size.width] + SGRHeaderInfoTitleRise;
     UIView *cover = SGRFindByIdentifier(header, @"CreativeWorkPlatform.Components.UI.ArtWorkElement.WithCoverArt", &kCoverKey);
     if (cover) applyHero(header, cover, bottom);
+    // The motion cover is looked up by the names the header shows, once both are in.
+    SGRAlbumHero *hero = objc_getAssociatedObject(header, &kHeroKey);
+    UIView *title = SGRFindByIdentifier(header, @"CreativeWorkPlatform.Components.UI.TitleRow", &kTitleKey);
+    UIView *parent = SGRFindByIdentifier(header, @"CreativeWorkPlatform.Components.UI.ParentRow", &kParentKey);
+    if (hero.superview) [hero playMotionOf:firstText(parent) album:firstText(title)];
 }
 
 static void applyPage(UIView *page) {

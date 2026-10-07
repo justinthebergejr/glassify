@@ -35,3 +35,12 @@ void SGRAlbumSetArtwork(UIView *view, UIImage *image);
 // The colour Spotify picked for the album, read off the wash it paints behind the header: the field takes it
 // over the one read from the cover's bottom edge. The same colour again is a no-op.
 void SGRAlbumSetSpotifyColor(UIView *view, UIColor *color);
+
+// AlbumMotion.m. The album's animated cover from Apple Music played in the header in place of the still one,
+// where Apple Music has one (on until switched off; the row is on the Appearance card, App/Pages.m).
+#define SGRKeyAlbumMotion @"spotifyglass.redesign.album.motion"
+@class SGModRow;
+SGModRow *SGRAlbumMotionRow(void);
+// The square motion cover of `album` by `artist`, downloaded, on the main queue: nil when the switch is off,
+// Apple Music has none, or it could not be fetched. Opening another album cancels the download before it.
+void SGRAlbumMotionClip(NSString *artist, NSString *album, void (^done)(NSURL *file));
