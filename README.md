@@ -21,12 +21,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/now-playing.webp" width="16%" alt="Full screen player with lyrics">
-  <img src="docs/screenshots/album.webp" width="16%" alt="Album">
-  <img src="docs/screenshots/playlist.webp" width="16%" alt="Playlist">
-  <img src="docs/screenshots/queue.webp" width="16%" alt="Queue">
-  <img src="docs/screenshots/live-activity.webp" width="16%" alt="Live Activity on the lock screen">
-  <img src="docs/screenshots/home.webp" width="16%" alt="Home">
+
 </p>
 
 > **Glassify is a free, open source fork of [spoti.pw](https://github.com/skopevoj/spoti.pw).**
