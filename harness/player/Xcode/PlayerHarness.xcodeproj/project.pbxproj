@@ -1,0 +1,450 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B91263DBF292E137B463326 /* SGBackdrop.m in Sources */ = {isa = PBXBuildFile; fileRef = 28DB5F1142AF0092211B810C /* SGBackdrop.m */; };
+		15D1ADAB8AFF573CFDF38848 /* PlayerLyrics.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D743E77FEFF3B08CD5E3A1 /* PlayerLyrics.m */; };
+		29563A17C02C957202EF1A52 /* KaraokeTiming.m in Sources */ = {isa = PBXBuildFile; fileRef = C3926DFA5D0D700C63CA1900 /* KaraokeTiming.m */; };
+		2FDAC5897D2B83EBC272FF88 /* SGRedesign.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A43584C9317D02C4D3D54EC /* SGRedesign.m */; };
+		384E45C1D7E3D4190E841241 /* LyricsText.m in Sources */ = {isa = PBXBuildFile; fileRef = C46BFE0B5E03380D19ACBE7E /* LyricsText.m */; };
+		41E102480A1F9135E2878687 /* SGRPalette.m in Sources */ = {isa = PBXBuildFile; fileRef = F215C38D0622F26A53B47B7B /* SGRPalette.m */; };
+		445A1709D1D9495DC914BC11 /* SGViewTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 041A9823DF9AD167D9503855 /* SGViewTree.m */; };
+		462219E00BF51E8E2756C89A /* SGRBridges.m in Sources */ = {isa = PBXBuildFile; fileRef = B8529E2578C8987585045966 /* SGRBridges.m */; };
+		47CAF110529B1E1BA2F49648 /* SGFlagForce.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C55B6E8C241E57CA91CF57 /* SGFlagForce.m */; };
+		5938E877265548CD488E30D4 /* SGGlass.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9D60F230F10EE8159C7B2F /* SGGlass.m */; };
+		5A8D767B75C7D827D53640A0 /* SGPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B6654A385A762EF3472DA80 /* SGPrefs.m */; };
+		5C3A069AEB8793102C7BF005 /* SGRRestyle.m in Sources */ = {isa = PBXBuildFile; fileRef = C2D2AB5AC376CC556815C949 /* SGRRestyle.m */; };
+		690600295057AF55AEE67A30 /* SGRTokens.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA9D11EE8D68E321658FB58 /* SGRTokens.m */; };
+		6906C8F0B8BFB7C70C8A4B99 /* SGUIMode.m in Sources */ = {isa = PBXBuildFile; fileRef = E0A5D5706746D17387BF75A7 /* SGUIMode.m */; };
+		7E4BD58BD0B8C54ED00820E6 /* PlayerScroll.m in Sources */ = {isa = PBXBuildFile; fileRef = 85094FCAB4335643E108A7BB /* PlayerScroll.m */; };
+		82A8615B255EF43A8DE1D062 /* PlayerArtwork.m in Sources */ = {isa = PBXBuildFile; fileRef = C671EE26E575E686D6DB728F /* PlayerArtwork.m */; };
+		8E58C6E074D27CC3120D5916 /* Protobuf.m in Sources */ = {isa = PBXBuildFile; fileRef = E454EB952C80A1A8A847C0D2 /* Protobuf.m */; };
+		9D324BF410C4AB6BFC414A20 /* stubs.m in Sources */ = {isa = PBXBuildFile; fileRef = 02F3EBA36827EE048FC2CB08 /* stubs.m */; };
+		ADDB700FE5221A09C02CAC64 /* SGRGlass.m in Sources */ = {isa = PBXBuildFile; fileRef = 055122B1648229F4B246E425 /* SGRGlass.m */; };
+		BD959CA89EAAB5149AE1EE87 /* SGRKaraokeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A4BB19FE487BBFE8D3B3011 /* SGRKaraokeView.m */; };
+		CC96096A8E25C0EB8495E116 /* PlayerField.m in Sources */ = {isa = PBXBuildFile; fileRef = C4AECAD076842A646AF48843 /* PlayerField.m */; };
+		D50C4BA69FF96465129FC081 /* SGRField.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AC4FD26D681C1D83A50B02A /* SGRField.m */; };
+		D6D28CEA6F0E197400D08303 /* SGRFlow.m in Sources */ = {isa = PBXBuildFile; fileRef = FA5A656D42000A6C36C08217 /* SGRFlow.m */; };
+		E192A57FD8431201B81D099C /* SGRGlyph.m in Sources */ = {isa = PBXBuildFile; fileRef = 646349D9BB50270031BFF0E2 /* SGRGlyph.m */; };
+		E7516931425F2F86E4ACCC23 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 80EE11B90FAB8527E8E2A949 /* main.m */; };
+		F71321E669B358576BDBEAAB /* PlayerFooter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF9FB9C42E03D99D39DAD00 /* PlayerFooter.m */; };
+		FC9528B783C67C579C501F3B /* SGLog.m in Sources */ = {isa = PBXBuildFile; fileRef = BFE26AA05BB8A15DA3A51B6F /* SGLog.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02F3EBA36827EE048FC2CB08 /* stubs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = stubs.m; path = ../stubs.m; sourceTree = SOURCE_ROOT; };
+		041A9823DF9AD167D9503855 /* SGViewTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGViewTree.m; path = ../../../tweak/Sources/Core/SGViewTree.m; sourceTree = SOURCE_ROOT; };
+		055122B1648229F4B246E425 /* SGRGlass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRGlass.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRGlass.m; sourceTree = SOURCE_ROOT; };
+		1A43584C9317D02C4D3D54EC /* SGRedesign.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRedesign.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRedesign.m; sourceTree = SOURCE_ROOT; };
+		1B6654A385A762EF3472DA80 /* SGPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGPrefs.m; path = ../../../tweak/Sources/Core/SGPrefs.m; sourceTree = SOURCE_ROOT; };
+		26858F66DF8624867574B286 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
+		28DB5F1142AF0092211B810C /* SGBackdrop.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGBackdrop.m; path = ../../../tweak/Sources/Core/SGBackdrop.m; sourceTree = SOURCE_ROOT; };
+		3B9D60F230F10EE8159C7B2F /* SGGlass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGGlass.m; path = ../../../tweak/Sources/Core/SGGlass.m; sourceTree = SOURCE_ROOT; };
+		5CF9FB9C42E03D99D39DAD00 /* PlayerFooter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlayerFooter.m; path = ../build/gen/PlayerFooter.m; sourceTree = SOURCE_ROOT; };
+		646349D9BB50270031BFF0E2 /* SGRGlyph.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRGlyph.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRGlyph.m; sourceTree = SOURCE_ROOT; };
+		6CA9D11EE8D68E321658FB58 /* SGRTokens.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRTokens.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRTokens.m; sourceTree = SOURCE_ROOT; };
+		77C55B6E8C241E57CA91CF57 /* SGFlagForce.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGFlagForce.m; path = ../../../tweak/Sources/Core/SGFlagForce.m; sourceTree = SOURCE_ROOT; };
+		80EE11B90FAB8527E8E2A949 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ../main.m; sourceTree = SOURCE_ROOT; };
+		85094FCAB4335643E108A7BB /* PlayerScroll.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlayerScroll.m; path = ../build/gen/PlayerScroll.m; sourceTree = SOURCE_ROOT; };
+		8A4BB19FE487BBFE8D3B3011 /* SGRKaraokeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRKaraokeView.m; path = ../../../tweak/Sources/Redesigned/Lyrics/SGRKaraokeView.m; sourceTree = SOURCE_ROOT; };
+		8AC4FD26D681C1D83A50B02A /* SGRField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRField.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRField.m; sourceTree = SOURCE_ROOT; };
+		B11C3D41A26AC926B6DB76D7 /* PlayerScroll.x */ = {isa = PBXFileReference; lastKnownFileType = text; name = PlayerScroll.x; path = ../../../tweak/Sources/Redesigned/Player/PlayerScroll.x; sourceTree = SOURCE_ROOT; };
+		B8529E2578C8987585045966 /* SGRBridges.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRBridges.m; path = ../build/gen/SGRBridges.m; sourceTree = SOURCE_ROOT; };
+		BA71EE1BA09955B35DC43823 /* PlayerFooter.x */ = {isa = PBXFileReference; lastKnownFileType = text; name = PlayerFooter.x; path = ../../../tweak/Sources/Redesigned/Player/PlayerFooter.x; sourceTree = SOURCE_ROOT; };
+		BFE26AA05BB8A15DA3A51B6F /* SGLog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGLog.m; path = ../../../tweak/Sources/Core/SGLog.m; sourceTree = SOURCE_ROOT; };
+		C2D2AB5AC376CC556815C949 /* SGRRestyle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRRestyle.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRRestyle.m; sourceTree = SOURCE_ROOT; };
+		C3926DFA5D0D700C63CA1900 /* KaraokeTiming.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KaraokeTiming.m; path = ../../../tweak/Sources/Shared/Lyrics/KaraokeTiming.m; sourceTree = SOURCE_ROOT; };
+		C46BFE0B5E03380D19ACBE7E /* LyricsText.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LyricsText.m; path = ../../../tweak/Sources/Redesigned/Lyrics/LyricsText.m; sourceTree = SOURCE_ROOT; };
+		C4AECAD076842A646AF48843 /* PlayerField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlayerField.m; path = ../build/gen/PlayerField.m; sourceTree = SOURCE_ROOT; };
+		C671EE26E575E686D6DB728F /* PlayerArtwork.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlayerArtwork.m; path = ../build/gen/PlayerArtwork.m; sourceTree = SOURCE_ROOT; };
+		CA20F62979E28F324A433BD6 /* PlayerLyrics.x */ = {isa = PBXFileReference; lastKnownFileType = text; name = PlayerLyrics.x; path = ../../../tweak/Sources/Redesigned/Player/PlayerLyrics.x; sourceTree = SOURCE_ROOT; };
+		E0A5D5706746D17387BF75A7 /* SGUIMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGUIMode.m; path = ../../../tweak/Sources/Core/SGUIMode.m; sourceTree = SOURCE_ROOT; };
+		E454EB952C80A1A8A847C0D2 /* Protobuf.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Protobuf.m; path = ../../../tweak/Sources/Shared/Lyrics/Protobuf.m; sourceTree = SOURCE_ROOT; };
+		E7D743E77FEFF3B08CD5E3A1 /* PlayerLyrics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlayerLyrics.m; path = ../build/gen/PlayerLyrics.m; sourceTree = SOURCE_ROOT; };
+		EA4C27D049E4906AA41071CB /* SGRBridges.x */ = {isa = PBXFileReference; lastKnownFileType = text; name = SGRBridges.x; path = ../../../tweak/Sources/Redesigned/Kit/SGRBridges.x; sourceTree = SOURCE_ROOT; };
+		ED282CB2BDC5AB386F465CEF /* PlayerArtwork.x */ = {isa = PBXFileReference; lastKnownFileType = text; name = PlayerArtwork.x; path = ../../../tweak/Sources/Redesigned/Player/PlayerArtwork.x; sourceTree = SOURCE_ROOT; };
+		F215C38D0622F26A53B47B7B /* SGRPalette.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRPalette.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRPalette.m; sourceTree = SOURCE_ROOT; };
+		F5BF48AA40CAD7891EB709FC /* PlayerHarness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayerHarness.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA5A656D42000A6C36C08217 /* SGRFlow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SGRFlow.m; path = ../../../tweak/Sources/Redesigned/Kit/SGRFlow.m; sourceTree = SOURCE_ROOT; };
+		FAD8E17E48D4D869FA1B834B /* PlayerField.x */ = {isa = PBXFileReference; lastKnownFileType = text; name = PlayerField.x; path = ../../../tweak/Sources/Redesigned/Player/PlayerField.x; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2AC8BA37DAC32D5437812408 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F5BF48AA40CAD7891EB709FC /* PlayerHarness.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2C3E6431158EB3B06E6198EF /* tweak/Sources */ = {
+			isa = PBXGroup;
+			children = (
+				BFE26AA05BB8A15DA3A51B6F /* SGLog.m */,
+				1B6654A385A762EF3472DA80 /* SGPrefs.m */,
+				041A9823DF9AD167D9503855 /* SGViewTree.m */,
+				3B9D60F230F10EE8159C7B2F /* SGGlass.m */,
+				28DB5F1142AF0092211B810C /* SGBackdrop.m */,
+				77C55B6E8C241E57CA91CF57 /* SGFlagForce.m */,
+				E0A5D5706746D17387BF75A7 /* SGUIMode.m */,
+				6CA9D11EE8D68E321658FB58 /* SGRTokens.m */,
+				F215C38D0622F26A53B47B7B /* SGRPalette.m */,
+				8AC4FD26D681C1D83A50B02A /* SGRField.m */,
+				FA5A656D42000A6C36C08217 /* SGRFlow.m */,
+				055122B1648229F4B246E425 /* SGRGlass.m */,
+				646349D9BB50270031BFF0E2 /* SGRGlyph.m */,
+				C2D2AB5AC376CC556815C949 /* SGRRestyle.m */,
+				1A43584C9317D02C4D3D54EC /* SGRedesign.m */,
+				8A4BB19FE487BBFE8D3B3011 /* SGRKaraokeView.m */,
+				C46BFE0B5E03380D19ACBE7E /* LyricsText.m */,
+				C3926DFA5D0D700C63CA1900 /* KaraokeTiming.m */,
+				E454EB952C80A1A8A847C0D2 /* Protobuf.m */,
+				CA20F62979E28F324A433BD6 /* PlayerLyrics.x */,
+				ED282CB2BDC5AB386F465CEF /* PlayerArtwork.x */,
+				BA71EE1BA09955B35DC43823 /* PlayerFooter.x */,
+				B11C3D41A26AC926B6DB76D7 /* PlayerScroll.x */,
+				FAD8E17E48D4D869FA1B834B /* PlayerField.x */,
+				EA4C27D049E4906AA41071CB /* SGRBridges.x */,
+			);
+			name = tweak/Sources;
+			sourceTree = "<group>";
+		};
+		3BAE78869960FAFA75858086 /* Harness */ = {
+			isa = PBXGroup;
+			children = (
+				80EE11B90FAB8527E8E2A949 /* main.m */,
+				02F3EBA36827EE048FC2CB08 /* stubs.m */,
+			);
+			name = Harness;
+			sourceTree = "<group>";
+		};
+		4EAE695AD1F489F78EA3E1C6 = {
+			isa = PBXGroup;
+			children = (
+				3BAE78869960FAFA75858086 /* Harness */,
+				984AA02D11FBEB9B83F96CE8 /* Generated (Logos) */,
+				2C3E6431158EB3B06E6198EF /* tweak/Sources */,
+				A9AE47250539F37226E64AEE /* Support */,
+				2AC8BA37DAC32D5437812408 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		984AA02D11FBEB9B83F96CE8 /* Generated (Logos) */ = {
+			isa = PBXGroup;
+			children = (
+				E7D743E77FEFF3B08CD5E3A1 /* PlayerLyrics.m */,
+				C671EE26E575E686D6DB728F /* PlayerArtwork.m */,
+				5CF9FB9C42E03D99D39DAD00 /* PlayerFooter.m */,
+				85094FCAB4335643E108A7BB /* PlayerScroll.m */,
+				C4AECAD076842A646AF48843 /* PlayerField.m */,
+				B8529E2578C8987585045966 /* SGRBridges.m */,
+			);
+			name = "Generated (Logos)";
+			sourceTree = "<group>";
+		};
+		A9AE47250539F37226E64AEE /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				26858F66DF8624867574B286 /* Info.plist */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* PlayerHarness */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E589D98E9C10B6E6EF092B1C /* Build configuration list for PBXNativeTarget "PlayerHarness" */;
+			buildPhases = (
+				CBAEFB375EAE8D8D62251F79 /* Generate Logos */,
+				C4D5163706E5908DC9E032F3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PlayerHarness;
+			productName = PlayerHarness;
+			productReference = F5BF48AA40CAD7891EB709FC /* PlayerHarness.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2700;
+			};
+			buildConfigurationList = B61A476A5531CC175278BDCF /* Build configuration list for PBXProject "PlayerHarness" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4EAE695AD1F489F78EA3E1C6;
+			productRefGroup = 2AC8BA37DAC32D5437812408 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* PlayerHarness */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		CBAEFB375EAE8D8D62251F79 /* Generate Logos */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player/PlayerLyrics.x",
+				"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player/PlayerArtwork.x",
+				"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player/PlayerFooter.x",
+				"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player/PlayerScroll.x",
+				"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player/PlayerField.x",
+				"$(SRCROOT)/../../../tweak/Sources/Redesigned/Kit/SGRBridges.x",
+			);
+			name = "Generate Logos";
+			outputPaths = (
+				"$(SRCROOT)/../build/gen/PlayerLyrics.m",
+				"$(SRCROOT)/../build/gen/PlayerArtwork.m",
+				"$(SRCROOT)/../build/gen/PlayerFooter.m",
+				"$(SRCROOT)/../build/gen/PlayerScroll.m",
+				"$(SRCROOT)/../build/gen/PlayerField.m",
+				"$(SRCROOT)/../build/gen/SGRBridges.m",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Mirrors harness/player/build.sh: runs Theos' Logos over the .x files into ../build/gen.\nset -e\nTHEOS=\"${THEOS:-$HOME/theos}\"\nLOGOS=\"$THEOS/bin/logos.pl\"\nif [ ! -f \"$LOGOS\" ]; then echo \"error: Theos not found at $THEOS. Install it, or add a THEOS build setting pointing at it.\"; exit 1; fi\nSRC=\"$SRCROOT/../../../tweak/Sources\"\nGEN=\"$SRCROOT/../build/gen\"\nmkdir -p \"$GEN\"\nfor f in Redesigned/Player/PlayerLyrics.x Redesigned/Player/PlayerArtwork.x Redesigned/Player/PlayerFooter.x Redesigned/Player/PlayerScroll.x Redesigned/Player/PlayerField.x Redesigned/Kit/SGRBridges.x; do\n    perl \"$LOGOS\" -c generator=internal \"$SRC/$f\" > \"$GEN/$(basename \"$f\" .x).m\"\ndone\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C4D5163706E5908DC9E032F3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7516931425F2F86E4ACCC23 /* main.m in Sources */,
+				9D324BF410C4AB6BFC414A20 /* stubs.m in Sources */,
+				15D1ADAB8AFF573CFDF38848 /* PlayerLyrics.m in Sources */,
+				82A8615B255EF43A8DE1D062 /* PlayerArtwork.m in Sources */,
+				F71321E669B358576BDBEAAB /* PlayerFooter.m in Sources */,
+				7E4BD58BD0B8C54ED00820E6 /* PlayerScroll.m in Sources */,
+				CC96096A8E25C0EB8495E116 /* PlayerField.m in Sources */,
+				462219E00BF51E8E2756C89A /* SGRBridges.m in Sources */,
+				FC9528B783C67C579C501F3B /* SGLog.m in Sources */,
+				5A8D767B75C7D827D53640A0 /* SGPrefs.m in Sources */,
+				445A1709D1D9495DC914BC11 /* SGViewTree.m in Sources */,
+				5938E877265548CD488E30D4 /* SGGlass.m in Sources */,
+				0B91263DBF292E137B463326 /* SGBackdrop.m in Sources */,
+				47CAF110529B1E1BA2F49648 /* SGFlagForce.m in Sources */,
+				6906C8F0B8BFB7C70C8A4B99 /* SGUIMode.m in Sources */,
+				690600295057AF55AEE67A30 /* SGRTokens.m in Sources */,
+				41E102480A1F9135E2878687 /* SGRPalette.m in Sources */,
+				D50C4BA69FF96465129FC081 /* SGRField.m in Sources */,
+				D6D28CEA6F0E197400D08303 /* SGRFlow.m in Sources */,
+				ADDB700FE5221A09C02CAC64 /* SGRGlass.m in Sources */,
+				E192A57FD8431201B81D099C /* SGRGlyph.m in Sources */,
+				5C3A069AEB8793102C7BF005 /* SGRRestyle.m in Sources */,
+				2FDAC5897D2B83EBC272FF88 /* SGRedesign.m in Sources */,
+				BD959CA89EAAB5149AE1EE87 /* SGRKaraokeView.m in Sources */,
+				384E45C1D7E3D4190E841241 /* LyricsText.m in Sources */,
+				29563A17C02C957202EF1A52 /* KaraokeTiming.m in Sources */,
+				8E58C6E074D27CC3120D5916 /* Protobuf.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1C07FA114C3B1BFB6219D6F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+			};
+			name = Debug;
+		};
+		99BA0622DB54D5BFD091069C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../tweak/Sources",
+					"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player",
+					"$(SRCROOT)/../../../tweak/Sources/Redesigned/Kit",
+					"$(SRCROOT)/../build/gen",
+				);
+				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				OTHER_CFLAGS = "-Wno-deprecated-declarations";
+				OTHER_LDFLAGS = (
+					"-framework",
+					UIKit,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					CoreGraphics,
+					"-framework",
+					CoreImage,
+					"-framework",
+					Foundation,
+					"-framework",
+					Symbols,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vojta.playerharness;
+				PRODUCT_NAME = PlayerHarness;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphonesimulator;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		AA0C1F719419B03B93D9182A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../tweak/Sources",
+					"$(SRCROOT)/../../../tweak/Sources/Redesigned/Player",
+					"$(SRCROOT)/../../../tweak/Sources/Redesigned/Kit",
+					"$(SRCROOT)/../build/gen",
+				);
+				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				OTHER_CFLAGS = "-Wno-deprecated-declarations";
+				OTHER_LDFLAGS = (
+					"-framework",
+					UIKit,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					CoreGraphics,
+					"-framework",
+					CoreImage,
+					"-framework",
+					Foundation,
+					"-framework",
+					Symbols,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.vojta.playerharness;
+				PRODUCT_NAME = PlayerHarness;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphonesimulator;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		EACC89DFBDBC23F92C301936 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B61A476A5531CC175278BDCF /* Build configuration list for PBXProject "PlayerHarness" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C07FA114C3B1BFB6219D6F4 /* Debug */,
+				EACC89DFBDBC23F92C301936 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E589D98E9C10B6E6EF092B1C /* Build configuration list for PBXNativeTarget "PlayerHarness" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0C1F719419B03B93D9182A /* Debug */,
+				99BA0622DB54D5BFD091069C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}

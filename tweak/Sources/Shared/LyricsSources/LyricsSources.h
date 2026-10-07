@@ -15,6 +15,8 @@
 #define SGKeyLyricsAllTracks @"spotifyglass.lyricsAllTracks"
 // Names the source the shown lines came from, on the full screen page.
 #define SGKeyLyricsCredit @"spotifyglass.lyricsCredit"
+// The user's Spicy Lyrics key, sl_pk_..., pasted on the Lyrics page.
+#define SGKeySpicyLyricsKey @"spotifyglass.lyrics.spicyKey"
 // The language a line's translation is asked for in, as an index into SGLyricsTranslationLanguages;
 // unset or 0 takes whatever translation the source has.
 #define SGKeyLyricsTranslationLanguage @"spotifyglass.lyricsTranslationLanguage"
@@ -35,6 +37,10 @@
 @property (nonatomic, copy) NSString *title, *artist, *album;
 @property (nonatomic) NSInteger seconds;
 @property (nonatomic) BOOL instrumental;
+// For a source whose terms require attribution (Spicy Lyrics): the credit to show in the source's own
+// words, and where tapping it goes. The view shows such a credit whatever Show source says.
+@property (nonatomic, copy) NSString *credit;
+@property (nonatomic, copy) NSURL *creditLink;
 @end
 
 // What is known about the track when a source is asked. Only trackID is always there; the rest is
@@ -91,6 +97,9 @@ extern NSString *const SGLyricsOwnRequestKey;
 // The name of the source the lines shown for the track came from, nil until they arrive.
 NSString *SGLyricsCreditFor(NSString *trackID);
 void SGLyricsSetCredit(NSString *trackID, NSString *name);
+// Whether a credit (as SGLyricsCreditFor answers it) must stay on screen, with the page tapping it opens,
+// nil for none; a credit no source required attribution for answers NO. Safe from any thread.
+BOOL SGLyricsCreditRequired(NSString *credit, NSURL **link);
 // Turns an install's old Musixmatch switches into an order. Called once, before anything reads one.
 void SGLyricsMigrateLegacyKeys(void);
 
@@ -127,5 +136,11 @@ extern SGLyricsAsk SGMusixmatchAsk;
 extern SGLyricsAsk SGUnisonAsk;
 extern SGLyricsAsk SGNetEaseAsk;
 extern SGLyricsAsk SGLrcLibAsk;
+extern SGLyricsAsk SGSpicyLyricsAsk;
+
+// SpicyLyrics.m. The user's own Spicy Lyrics key (its terms forbid shipping one), nil when none is set;
+// setting an empty one clears it.
+NSString *SGSpicyLyricsKey(void);
+void SGSetSpicyLyricsKey(NSString *key);
 
 UIViewController *SGLyricsSourcesPage(void);   // the ordered list on the Lyrics page

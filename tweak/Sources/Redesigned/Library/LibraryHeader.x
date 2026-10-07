@@ -70,8 +70,15 @@ static UIView *childNamed(UIView *host, NSString *marker) {
     return nil;
 }
 
+// The soft edge alone reaches only as far down as the status bar (UIKit sizes it from the bars it knows of,
+// and the header is a view of Spotify's own over the list), so the Kit's black fade goes behind the header and
+// just past its bottom, short of the first row, and the rows scrolling up fade into it instead of showing
+// through the title and the chips.
+static const CGFloat kBackdropFade = 6;
+
 void SGRLibraryClearScrim(UIView *header) {
     vanish(childNamed(header, @"GradientView"));
+    SGRHeaderBackdropIn(header, kBackdropFade);
 }
 
 #pragma mark - the controls

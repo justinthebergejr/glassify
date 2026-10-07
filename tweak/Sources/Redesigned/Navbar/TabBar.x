@@ -332,6 +332,15 @@ static void makeRoom(UIViewController *container) {
     SGLog(@"tab bar: %.0f pt of room made under Spotify's bar for the glass bar's %.0f, over an inset of %.0f", room, height, inset);
 }
 
+// While the player opens or closes Spotify hides its own bar and moves a picture of it (BarTransition.x).
+// Its hide reaches the row it drew, which goes transparent here anyway, and not the system bar beside it,
+// so the system bar stayed where it was under the picture sliding over it: two bars, one over the other.
+void SGRTabBarSetHiddenForTransition(BOOL hidden) {
+    UIView *host = sg_stockBar ? objc_getAssociatedObject(sg_stockBar, &kHostKey) : nil;
+    CGFloat alpha = hidden ? 0 : 1;
+    if (host && host.alpha != alpha) host.alpha = alpha;
+}
+
 static void syncBar(UIView *stockBar) {
     sg_stockBar = stockBar;
 

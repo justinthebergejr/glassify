@@ -14,10 +14,16 @@
 // and alpha changes. Live glass at half alpha still renders (simulator). The tab bar's selection bubble
 // is not copied.
 //
+// Spotify's hide of the real tab bar reaches only the row it draws, not the redesign's system bar beside it
+// (Redesigned/Navbar/TabBar.x), so that one is hidden here from the moment the picture stands in for it until
+// the transition has ended, or the two showed one over the other as the player was swiped down.
+//
 // MainUI_TabBarUIImpl.CompactOverlayTransition is a Swift animator with the same stand-ins
 // (npbSnapshotView, tabBarSnapshotView); which of the two 9.1.78 runs is not known, so both are hooked
 // and the log says which fired.
 #import "Core/SGCore.h"
+#import "Redesigned/Kit/SGRKit.h"
+#import "Redesigned/Navbar/Navbar.h"
 
 @interface SPTBarOverlayPresentationTransition : NSObject
 - (UIView *)bottomBarView;
@@ -86,14 +92,43 @@ static void backWithGlass(UIView *snapshot, UIView *source, NSString *what) {
     if (logged++ < 4) SGLog(@"player transition: %@ stand-in got %lu glass panes", what, (unsigned long)panes.count);
 }
 
+// The tab bar's picture as a live snapshot of the bar instead: the selected tab's glyph and title are drawn
+// inside the selection bubble, which is glass, so the copied panes above left the selected tab (Home) blank
+// all the way down. A snapshot view keeps glass (see the top). Spotify may have hidden the bar again before
+// handing the picture over, so it is shown for the one render the snapshot takes, which goes on under the
+// player covering the screen. NO when there is nothing to snapshot; the panes are the fallback.
+static BOOL liveStandIn(UIView *snapshot, UIView *source) {
+    if (![snapshot isKindOfClass:UIImageView.class] || !source.window) return NO;
+    UIImageView *image = (UIImageView *)snapshot;
+    if (!image.image || image.subviews.count) return NO;
+    BOOL wasHidden = source.hidden;
+    CGFloat alpha = source.alpha;
+    source.hidden = NO;
+    source.alpha = 1;
+    UIView *live = [source snapshotViewAfterScreenUpdates:YES];
+    source.hidden = wasHidden;
+    source.alpha = alpha;
+    if (!live) return NO;
+    live.frame = image.bounds;
+    live.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    live.userInteractionEnabled = NO;
+    image.image = nil;
+    [image addSubview:live];
+    static NSUInteger logged;
+    if (logged++ < 4) SGLog(@"player transition: tab bar stand-in is a live snapshot, selection included");
+    return YES;
+}
+
 %hook SPTBarOverlayPresentationTransition
 - (void)setBarSnapshotView:(UIView *)view {
     backWithGlass(view, [self bottomBarView], @"bar");
     %orig;
 }
 - (void)setTabBarSnapshotView:(UIView *)view {
-    backWithGlass(view, [self tabBarView], @"tab bar");
+    if (!liveStandIn(view, [self tabBarView])) backWithGlass(view, [self tabBarView], @"tab bar");
     %orig;
+    // The picture stands in for the bar from here; the glass bar itself would show under it.
+    if (view) SGRTabBarSetHiddenForTransition(YES);
 }
 %end
 
@@ -109,13 +144,27 @@ static id ivarNamed(id object, const char *name) {
     dispatch_once(&once, ^{ SGLog(@"player transition: CompactOverlayTransition animates, snapshots %@ / %@",
                                   [ivarNamed(self, "npbSnapshotView") class], [ivarNamed(self, "tabBarSnapshotView") class]); });
     backWithGlass(ivarNamed(self, "npbSnapshotView"), ivarNamed(self, "npbView"), @"bar");
-    backWithGlass(ivarNamed(self, "tabBarSnapshotView"), ivarNamed(self, "tabBarView"), @"tab bar");
+    if (!liveStandIn(ivarNamed(self, "tabBarSnapshotView"), ivarNamed(self, "tabBarView"))) {
+        backWithGlass(ivarNamed(self, "tabBarSnapshotView"), ivarNamed(self, "tabBarView"), @"tab bar");
+    }
+    if (ivarNamed(self, "tabBarSnapshotView")) SGRTabBarSetHiddenForTransition(YES);
 }
 %end
+
+// The glass bar back once the player has finished opening or closing, cancelled drags included.
+@interface SGRBarTransitionWatcher : NSObject
+@end
+@implementation SGRBarTransitionWatcher
+@end
+static SGRBarTransitionWatcher *sg_transitionWatcher;
 
 %ctor {
     if (!SGRedesignedUI()) return;
     %init;
+    sg_transitionWatcher = [SGRBarTransitionWatcher new];
+    SGRObservePlayerTransition(sg_transitionWatcher, nil, ^(id owner) {
+        SGRTabBarSetHiddenForTransition(NO);
+    });
     SGRequireClasses(@[
         @"SPTBarOverlayPresentationTransition",
         @"_TtC19MainUI_TabBarUIImpl24CompactOverlayTransition",

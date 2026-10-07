@@ -17,7 +17,8 @@
 // The list of every library page (trees/clean/library/03.txt:25).
 extern NSString *const SGRLibraryListIdentifier;
 
-// LibraryHeader.x. The scrim Spotify lays behind a library header taken out, so the soft scroll edge
-// (Kit/SGREdgeEffect.x) is what keeps the header clear of the list under it. A header without one is left
-// alone; the folder's has none.
+// LibraryHeader.x. The scrim Spotify lays behind a library header taken out and the Kit's black fade put in its
+// place (Kit/SGRHeaderBackdrop.h), which keeps the header clear of the list under it where the soft scroll edge
+// (Kit/SGREdgeEffect.x) reaches only the status bar. A header without a scrim still gets the fade; the folder's
+// has none.
 void SGRLibraryClearScrim(UIView *header);

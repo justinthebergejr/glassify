@@ -1070,6 +1070,8 @@ typedef struct {
     UILabel *_credit;
     CGFloat _fontSize, _margin, _lineGap, _blurPerLine, _maxBlur;
     BOOL _crediting;   // the switch is read once: the page asks for the source on every frame until it has one
+    NSString *_creditSource;   // the source last asked about, so a credit not shown is not looked up every frame
+    NSURL *_creditLink;        // where tapping the credit goes, for a source whose terms ask for one
     double _clock;
     NSInteger _reported;
     CFTimeInterval _clockTime;
@@ -1131,6 +1133,11 @@ typedef struct {
 
 - (void)tapped:(UITapGestureRecognizer *)tap {
     if (_extras && !_extras.hidden && CGRectContainsPoint(_extras.frame, [tap locationInView:self])) return;
+    // A credit with a link (a community sync's uploader) opens it.
+    if (_creditLink && !_credit.hidden && CGRectContainsPoint(CGRectInset(_credit.frame, -8, -10), [tap locationInView:self])) {
+        [UIApplication.sharedApplication openURL:_creditLink options:@{} completionHandler:nil];
+        return;
+    }
     CGPoint point = [tap locationInView:_scroll];
     for (SGRKaraokeLineView *view in _shown.allValues) {
         CGRect target = view.bubbleTarget;
@@ -1274,8 +1281,11 @@ typedef struct {
     [self alignFade];
     _scroll.contentSize = self.bounds.size;
     [_credit sizeToFit];
+    // A long credit (a community sync's uploader and maker) is cut short rather than run off the page.
+    CGFloat creditLeft = _margin + (_extras && !_extras.hidden ? kExtrasSide + kExtrasCreditGap : 0);
+    CGFloat creditWidth = MIN(_credit.bounds.size.width, MAX(0, self.bounds.size.width - creditLeft - _margin));
     _credit.frame = CGRectMake(_margin, self.bounds.size.height - _credit.bounds.size.height - kCreditBottom,
-                               _credit.bounds.size.width, _credit.bounds.size.height);
+                               creditWidth, _credit.bounds.size.height);
     if (_extras && !_extras.hidden) {
         _extras.frame = CGRectMake(_margin, self.bounds.size.height - kExtrasSide - kExtrasBottom, kExtrasSide, kExtrasSide);
         _credit.center = CGPointMake(CGRectGetMaxX(_extras.frame) + kExtrasCreditGap + _credit.bounds.size.width / 2, _extras.center.y);
@@ -1601,7 +1611,11 @@ typedef struct {
 }
 
 - (void)creditTo:(NSString *)source {
-    NSString *text = source.length && _crediting ? [NSString stringWithFormat:@"Lyrics from %@", source] : nil;
+    _creditSource = source;
+    NSURL *link = nil;
+    BOOL required = SGLyricsCreditRequired(source, &link);
+    _creditLink = required ? link : nil;
+    NSString *text = source.length && (_crediting || required) ? [NSString stringWithFormat:@"Lyrics from %@", source] : nil;
     if (text == _credit.text || [text isEqualToString:_credit.text]) return;
     _credit.text = text;
     _credit.hidden = !_showing || !text.length;
@@ -1668,8 +1682,12 @@ typedef struct {
         [self setNeedsLayout];
     }
     [self setShowing:_tops != nil];
-    // The source is settled a moment after the lines are, so it is asked for until it answers.
-    if (_crediting && _lines && !_credit.text.length) [self creditTo:SGLyricsCreditFor(track)];
+    // The source is settled a moment after the lines are, so it is asked for until it answers. Asked
+    // with Show source off too: a source whose terms require its credit (Spicy Lyrics) shows it anyway.
+    if (_lines && !_credit.text.length) {
+        NSString *source = SGLyricsCreditFor(track);
+        if (source.length && ![source isEqualToString:_creditSource]) [self creditTo:source];
+    }
     if (!_tops) return;
     [self alignFade];
     if (_plain) {

@@ -28,6 +28,9 @@ void SGRComposeTabBar(UIView *tabBar);
 void SGRLogTabBarRow(UIView *tabBar);
 // Lays the bar out again after the Navbar page changes something, so it does not wait for a touch.
 void SGRRefreshTabBar(void);
+// TabBar.x. Hides the glass bar while Spotify moves its picture of the bar for the player's open and close,
+// and shows it again (Redesigned/NowPlayingBar/BarTransition.x).
+void SGRTabBarSetHiddenForTransition(BOOL hidden);
 
 UIViewController *SGRNavbarSettingsPage(void);   // the tab editor, in Mod Settings
 UIViewController *SGRNavbarEditorPage(void);     // the tab editor alone, for the welcome tour

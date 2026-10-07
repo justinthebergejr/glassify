@@ -2,9 +2,10 @@
 // colour along the artwork's bottom edge, the field colour made from it, and the blurred bitmaps the
 // field (SGRField.h) draws instead of a live blur.
 //
-// The field colour is the edge colour with its saturation held to 0.55 and its relative luminance to
-// 0.07 (0.04 with Increase Contrast). On anything that dark white text is past 8:1 and SGRSecondary
-// (white 65%) past 4.5:1, WCAG AA, whatever the hue.
+// The field colour is the edge colour with its saturation held to 0.7 and its relative luminance to
+// 0.10 (0.04 with Increase Contrast), the Music app's richer page colours. White text is past 7:1 on
+// anything that dark, whatever the hue; SGRSecondary (white 65%) comes to about 4.3:1, as the Music
+// app's secondary text does, and Increase Contrast keeps the darker field that puts it past 4.5:1.
 //
 // Threading: +paletteForImage: may be called from the main thread only and calls back on it. The work
 // runs on one serial background queue; UIImage and CoreImage are read there, UIKit views are not.

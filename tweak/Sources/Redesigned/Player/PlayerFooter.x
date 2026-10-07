@@ -5,7 +5,10 @@
 // trailing edge. Connect and the queue stay Spotify's controls (the device sheet, the remote device
 // tint, the Jam avatars) and are only moved, by a translation of the arranged view that holds each: a
 // transform survives the stack view laying them out again, and moving the holder keeps its touches
-// inside its own bounds. The device name goes transparent, since the glyph alone sits in the middle.
+// inside its own bounds. The device name goes transparent, since the glyph alone sits in the middle. The moves
+// are put back on every pass of the row as well as the unit's: the row lays itself out again when a control in
+// it changes size, as the queue control does when it shows a friend's share ("From emily"), and that control,
+// wider then, is kept inside the footer's edge with devices centred between it and lyrics.
 // Spotify has no lyrics control down here, so that one is the Kit's glyph button, and it turns the
 // lyrics in the player on and off (PlayerLyrics.x): filled while they are up, dimmed and dead for a
 // track that has none.
@@ -184,11 +187,32 @@ static void lowerRow(UIView *row) {
     });
 }
 
-%hook _TtC20NowPlaying_ModesImpl18FooterElementsUnit
-- (void)viewDidLayoutSubviews {
-    %orig;
-    UIView *host = ((UIViewController *)self).viewIfLoaded;
-    if (!host) return;
+// A song a friend shared widens the queue control: Spotify shows "From <friend>" with their avatar inside it,
+// in a part that is collapsed to nothing otherwise (trees: QueueButtonNowPlaying 47x32 holding an EncoreButton
+// 0x0 with avatar slots and a label). Centred at kTrailing like the bare glyph, the wide control ran over the
+// devices glyph; it is kept inside the footer's edge instead, and devices centred in what is left.
+static const CGFloat kQueueBareMax = 64, kQueueEdge = 16;
+
+// What `view` draws, in `host`'s coordinates: its bounds and every visible descendant's, a hidden or
+// transparent part left out with all under it (the empty avatar slots stay hidden in the bare control). The
+// share is drawn past the control's own 47pt, to its leading side, so the control's bounds do not show it.
+static void addExtent(UIView *view, UIView *host, CGRect *extent) {
+    for (UIView *sub in view.subviews) {
+        if (sub.hidden || sub.alpha < 0.01) continue;
+        if (sub.bounds.size.width >= 1 && sub.bounds.size.height >= 1) {
+            *extent = CGRectUnion(*extent, [sub convertRect:sub.bounds toView:host]);
+        }
+        addExtent(sub, host, extent);
+    }
+}
+
+static CGRect drawnExtent(UIView *view, UIView *host) {
+    CGRect extent = [view convertRect:view.bounds toView:host];
+    addExtent(view, host, &extent);
+    return extent;
+}
+
+static void layoutFooter(UIView *host) {
     // The unit lays out before its row does, and the moves are measured from where the row put things.
     [SGRowIn(host) layoutIfNeeded];
     CGFloat width = host.bounds.size.width, middleY = CGRectGetMidY(host.bounds);
@@ -216,18 +240,66 @@ static void lowerRow(UIView *row) {
         }
     }
     UIView *pinned = glyph ?: connect;
-    CGFloat connectFrom = moveTo(arrangedAround(connect, host), pinned, CGPointMake(CGRectGetMidX(pinned.bounds), CGRectGetMidY(pinned.bounds)), host, round(width * kMiddle));
-
     UIView *queue = SGRFindByIdentifier(host, @"QueueButtonNowPlaying", &kQueueKey);
-    CGFloat queueFrom = moveTo(arrangedAround(queue, host), queue, CGPointMake(CGRectGetMidX(queue.bounds), CGRectGetMidY(queue.bounds)), host, round(width * (rtl ? kLeading : kTrailing)));
+    CGFloat connectX = round(width * kMiddle), queueX = round(width * (rtl ? kLeading : kTrailing));
+    // Measured against the control's middle as it is drawn now, so the move already on it cancels out.
+    CGRect drawn = queue ? drawnExtent(queue, host) : CGRectNull;
+    CGFloat middle = queue ? CGRectGetMidX([queue convertRect:queue.bounds toView:host]) : 0;
+    CGFloat queueWidth = CGRectIsNull(drawn) ? 0 : drawn.size.width;
+    BOOL wide = queueWidth > kQueueBareMax;
+    if (wide) {
+        // The far edge of all of it kQueueEdge in from the footer's, devices halfway from lyrics to its near edge.
+        CGFloat toFar = rtl ? middle - CGRectGetMinX(drawn) : CGRectGetMaxX(drawn) - middle;
+        CGFloat toNear = rtl ? CGRectGetMaxX(drawn) - middle : middle - CGRectGetMinX(drawn);
+        queueX = round(rtl ? kQueueEdge + toFar : width - kQueueEdge - toFar);
+        CGFloat near = rtl ? queueX + toNear : queueX - toNear;
+        connectX = round((lyrics.center.x + near) / 2);
+    }
+    CGFloat connectFrom = moveTo(arrangedAround(connect, host), pinned, CGPointMake(CGRectGetMidX(pinned.bounds), CGRectGetMidY(pinned.bounds)), host, connectX);
+    CGFloat queueFrom = moveTo(arrangedAround(queue, host), queue, CGPointMake(CGRectGetMidX(queue.bounds), CGRectGetMidY(queue.bounds)), host, queueX);
 
     lowerRow(host);
 
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         SGLog(@"redesign player: footer lyrics at %.0f, connect %.0f (%@) to %.0f, queue %.0f to %.0f, share %@", lyrics.center.x,
-              connectFrom, glyph ? @"glyph" : @"button", round(width * kMiddle), queueFrom, round(width * (rtl ? kLeading : kTrailing)), share ? @"gone" : @"not found");
+              connectFrom, glyph ? @"glyph" : @"button", connectX, queueFrom, queueX, share ? @"gone" : @"not found");
     });
+    static BOOL widened;
+    if (wide && !widened) {
+        widened = YES;
+        SGLog(@"redesign player: queue control %.0fpt wide (a friend's share), kept at %.0f, devices at %.0f", queueWidth, queueX, connectX);
+    }
+}
+
+static char kRowWatchedKey;
+
+%hook _TtC20NowPlaying_ModesImpl18FooterElementsUnit
+- (void)viewDidLayoutSubviews {
+    %orig;
+    UIView *host = ((UIViewController *)self).viewIfLoaded;
+    if (!host) return;
+    layoutFooter(host);
+    // The row lays itself out again when a control in it changes size (the queue control growing a friend's
+    // share), on passes that reach neither the unit nor this hook: the moves are put back on each of them.
+    UIStackView *row = SGRowIn(host);
+    __weak UIView *weakHost = host;
+    void (^again)(UIView *) = ^(UIView *view) {
+        UIView *strongHost = weakHost;
+        if (strongHost) layoutFooter(strongHost);
+    };
+    if (row && !objc_getAssociatedObject(row, &kRowWatchedKey)) {
+        objc_setAssociatedObject(row, &kRowWatchedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        SGRObserveLayout(row, again);
+    }
+    // The share can turn up inside the queue control without the row laying out at all; its own passes too,
+    // where the control can be watched (a Swift class may refuse, and then the row's passes are what there is).
+    UIView *queue = SGRFindByIdentifier(host, @"QueueButtonNowPlaying", &kQueueKey);
+    if (queue && !objc_getAssociatedObject(queue, &kRowWatchedKey)) {
+        objc_setAssociatedObject(queue, &kRowWatchedKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        BOOL watched = SGRObserveLayout(queue, again);
+        SGLog(@"redesign player: queue control %@ for a friend's share", watched ? @"watched" : @"not watchable, the row's passes stand in");
+    }
 }
 %end
 

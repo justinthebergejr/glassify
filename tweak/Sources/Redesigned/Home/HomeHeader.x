@@ -24,6 +24,47 @@
 
 // Tries at finding the tab's name before settling for the English one: a miss walks the window.
 static const NSUInteger kTitleTries = 8;
+// How far under the header's 112pt the backdrop fades out: past the large title, short of the first row of
+// cards (about 15pt under the header, 25pt with kListGap), which would otherwise be dimmed at rest.
+static const CGFloat kBackdropFade = 8;
+// Room added between the large title and the first row of tiles, so the tiles do not start right under the
+// backdrop's fade: on top of the inset Spotify gives the list.
+static const CGFloat kListGap = 10;
+static char kListInsetKey;
+static __weak UIScrollView *sg_list;
+
+// The page's feed: the first collection view under the page taller than half of it (the shortcuts grid and
+// the shelves are collection views inside it, and shorter).
+static UIScrollView *listIn(UIView *view) {
+    if (sg_list.window && [sg_list isDescendantOfView:view]) return sg_list;
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:view];
+    for (NSUInteger at = 0; at < queue.count && at < 400; at++) {
+        UIView *v = queue[at];
+        if (v != view && [v isKindOfClass:UICollectionView.class] && v.bounds.size.height > view.bounds.size.height / 2) {
+            sg_list = (UIScrollView *)v;
+            return sg_list;
+        }
+        [queue addObjectsFromArray:v.subviews];
+    }
+    return nil;
+}
+
+// kListGap on top of Spotify's inset, put back whenever Spotify sets its own again. A page resting at its top
+// follows the new inset, so the gap shows rather than scrolling the first row under the title.
+static void spaceList(UIView *view) {
+    UIScrollView *list = listIn(view);
+    if (!list) return;
+    UIEdgeInsets inset = list.contentInset;
+    NSNumber *set = objc_getAssociatedObject(list, &kListInsetKey);
+    if (set && fabs(inset.top - set.doubleValue) < 0.5) return;
+    BOOL atTop = list.contentOffset.y <= -list.adjustedContentInset.top + 1;
+    inset.top += kListGap;
+    list.contentInset = inset;
+    objc_setAssociatedObject(list, &kListInsetKey, @(inset.top), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (atTop) list.contentOffset = CGPointMake(list.contentOffset.x, -list.adjustedContentInset.top);
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{ SGLog(@"redesign home: %.0fpt more room above the feed, inset now %.0f", kListGap, inset.top); });
+}
 
 static char kTitleKey, kTabKey;
 static NSString *sg_tabName;
@@ -104,6 +145,9 @@ static void layoutHeader(UIViewController *page) {
     UIView *header = sg_header;
     UIStackView *stack = sg_stack;
     vanish(sg_scrim);
+    // The soft edge reaches only the status bar; the Kit's black fade, in the scrim's place, covers the title.
+    SGRHeaderBackdropIn(sg_scrim.superview, kBackdropFade);
+    spaceList(view);
 
     static Class faceClass;
     if (!faceClass) faceClass = NSClassFromString(@"_TtC29ListeningActivity_ElementsKit21AdaptiveFaceContainer");

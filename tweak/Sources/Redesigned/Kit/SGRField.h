@@ -30,6 +30,9 @@ extern NSNotificationName const SGRFieldColorDidChangeNotification;
 @property (nonatomic) BOOL motionHeld;
 // The backdrop's height in points from the top of the bounds; 0 is the window's height.
 @property (nonatomic) CGFloat backdropHeight;
+// YES (the default): the colour fades to black down the page. NO keeps the colour the whole way down, the
+// Music app's artist page.
+@property (nonatomic) BOOL fadesToBlack;
 // SGRNeutralField until a colour arrives.
 @property (nonatomic, readonly) UIColor *fieldColor;
 

@@ -5,8 +5,10 @@
 
 static const size_t kSample = 64;      // the artwork shrunk to this square before its colours are read
 static const size_t kEdgeRows = 10;    // the bottom rows of it averaged into the edge colour
-static const CGFloat kMaxSaturation = 0.55;
-static const CGFloat kMaxLuminance = 0.07, kMaxLuminanceContrast = 0.04;
+// The Music app's pages keep the picture's colour rich and fairly light (an olive page for an olive photo,
+// where 0.55 and 0.07 made it a dull brown): at 0.10 white text is still past 7:1.
+static const CGFloat kMaxSaturation = 0.7;
+static const CGFloat kMaxLuminance = 0.10, kMaxLuminanceContrast = 0.04;
 static const CGFloat kBackdropWidth = 160, kBackdropMaxHeight = 400, kBackdropSigma = 12;
 static const CGFloat kDissolveWidth = 96, kDissolveSigma = 5;
 static const CGFloat kFadeFrom = 0.55, kDissolveOpaque = 0.85;

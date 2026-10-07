@@ -15,7 +15,8 @@ static NSString *const kSearch = @"https://lrclib.net/api/search";
 static const NSInteger kLengthSlack = 4;
 
 static NSDictionary<NSString *, NSString *> *headers(void) {
-    return @{@"User-Agent": @"spoti.pw " @SG_VERSION @" (https://github.com/skopevoj/spoti.pw)"};
+    // LRCLIB asks clients to say who they are: a personal build of spoti.pw, under its own name.
+    return @{@"User-Agent": @"Glassify " @SG_VERSION @" (personal build of spoti.pw)"};
 }
 
 // [00:34.30] Look — the timestamp in minutes, seconds and hundredths, or thousandths where a line

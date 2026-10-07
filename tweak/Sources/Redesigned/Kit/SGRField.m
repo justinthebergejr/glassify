@@ -50,6 +50,7 @@ static NSDictionary *noActions(void) {
     self.clipsToBounds = NO;
     self.accessibilityElementsHidden = YES;
     _color = SGRNeutralField();
+    _fadesToBlack = YES;
 
     _solid = [CALayer layer];
     _solid.actions = noActions();
@@ -105,6 +106,12 @@ static NSDictionary *noActions(void) {
     [CATransaction commit];
 }
 
+- (void)setFadesToBlack:(BOOL)fadesToBlack {
+    if (fadesToBlack == _fadesToBlack) return;
+    _fadesToBlack = fadesToBlack;
+    _black.hidden = _flows || !fadesToBlack;
+}
+
 #pragma mark - the moving field
 
 - (void)setFlows:(BOOL)flows {
@@ -116,7 +123,7 @@ static NSDictionary *noActions(void) {
         [self.layer insertSublayer:_flow above:_solid];
     }
     // The moving field is the whole picture: no still backdrop over it, no fade to black under it.
-    _black.hidden = flows;
+    _black.hidden = flows || !_fadesToBlack;
     if (flows) _backdrop.hidden = YES;
     else _flow.hidden = YES;
     [self watch];

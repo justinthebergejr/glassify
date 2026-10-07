@@ -18,7 +18,7 @@
 #import "Redesigned/NowPlayingBar/NowPlayingBar.h"
 #import "Redesigned/Kit/SGRAccent.h"
 
-NSString *const SGRedesignedUIInfo = @"The newest version of spoti.pw, leaning towards Apple Music's style. It is not compatible with the legacy look's settings.\n\nThe legacy look gives you more freedom, yet still looks like Spotify.";
+NSString *const SGRedesignedUIInfo = @"The newest version of Glassify, leaning towards Apple Music's style. It is not compatible with the legacy look's settings.\n\nThe legacy look gives you more freedom, yet still looks like Spotify.";
 
 void SGSetRedesignedUI(BOOL on) {
     SGSetEnabled(SGKeyRedesign, on);
@@ -48,10 +48,44 @@ static SGModRow *unavailableRow(void) {
     return SGWithSymbol(row, @"sparkles");
 }
 
+// The home screen icon: Glassify's (the build's own) or Spotify's, which the build ships as the alternate
+// "Spotify" when it is given one (scripts/pipeline.sh, ALT_ICON_DIR). nil when there is no alternate to switch to.
+static NSString *const kSpotifyIcon = @"Spotify";
+
+static BOOL hasSpotifyIcon(void) {
+    NSDictionary *icons = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleIcons"];
+    NSDictionary *alternates = [icons isKindOfClass:NSDictionary.class] ? icons[@"CFBundleAlternateIcons"] : nil;
+    return [alternates isKindOfClass:NSDictionary.class] && alternates[kSpotifyIcon] && UIApplication.sharedApplication.supportsAlternateIcons;
+}
+
+static void setAppIcon(NSString *name) {
+    if ([UIApplication.sharedApplication.alternateIconName ?: @"" isEqualToString:name ?: @""]) return;
+    [UIApplication.sharedApplication setAlternateIconName:name completionHandler:^(NSError *error) {
+        if (error) SGLog(@"app icon: not changed: %@", error.localizedDescription);
+    }];
+}
+
+static SGModRow *appIconRow(void) {
+    if (!hasSpotifyIcon()) return nil;
+    SGModRow *row = SGStatActionRow(@"App icon", nil, ^NSString *{
+        return UIApplication.sharedApplication.alternateIconName ? @"Spotify" : @"Glassify";
+    }, ^{
+        UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"App icon" message:nil
+                                                                preferredStyle:UIAlertControllerStyleActionSheet];
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Glassify" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) { setAppIcon(nil); }]];
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Spotify" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) { setAppIcon(kSpotifyIcon); }]];
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [SGTopController() presentViewController:sheet animated:YES completion:nil];
+    });
+    return SGWithSymbol(row, @"app.badge");
+}
+
 SGModSection *SGAppearanceSection(void) {
+    SGModRow *icon = appIconRow();
     if (!SGRedesignAvailable()) {
         NSMutableArray<SGModRow *> *rows = [NSMutableArray arrayWithObject:unavailableRow()];
         [rows addObjectsFromArray:SGNativeAppearanceRows()];
+        if (icon) [rows addObject:icon];
         return SGNotedSection(@"Appearance", rows, @"Changes apply after you restart Spotify.");
     }
     SGModRow *redesign = SGOptionRow(@"Redesigned UI", nil, SGKeyRedesign);
@@ -63,6 +97,7 @@ SGModSection *SGAppearanceSection(void) {
     };
     NSMutableArray<SGModRow *> *rows = [NSMutableArray arrayWithObject:SGWithSymbol(redesign, @"sparkles")];
     [rows addObjectsFromArray:SGRedesignedUIStored() ? SGRAppearanceRows() : SGNativeAppearanceRows()];
+    if (icon) [rows addObject:icon];
     return SGNotedSection(@"Appearance", rows, @"Changes apply after you restart Spotify.");
 }
 

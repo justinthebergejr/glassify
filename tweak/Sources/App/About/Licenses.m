@@ -30,11 +30,15 @@ static NSString *const kZlib =
     @"3. This notice may not be removed or altered from any source distribution.";
 
 UIViewController *SGLicensesPage(void) {
-    SGModRow *mod = SGLinkRow(@"spoti.pw", @"PolyForm Strict License 1.0.0", [SGRepoURL stringByAppendingString:@"/blob/main/LICENSE"]);
+    // Glassify is a fork of spoti.pw from before spoti.pw moved to another license (upstream commit c790445,
+    // GPL-3.0), and is GPL-3.0 itself. spoti.pw stays named and linked at that commit, as the GPL asks.
+    SGModRow *glassify = SGStatRow(@"Glassify", ^NSString *{ return @"GPL-3.0"; });
+    SGModRow *mod = SGLinkRow(@"spoti.pw by Vojtěch Škopek", @"GPL-3.0 · the code Glassify is a fork of",
+                              @"https://github.com/skopevoj/spoti.pw/tree/c790445");
     SGModRow *bs2b = SGLinkRow(@"libbs2b", @"Crossfeed · MIT License", @"https://github.com/alexmarsev/libbs2b");
     SGModRow *wdl = SGLinkRow(@"WDL", @"Liveprog's EEL2 · zlib License", @"https://github.com/justinfrankel/WDL");
-    return [[SGModPage alloc] initWithTitle:@"Licenses" intro:@"The mod's own license, and the code from others it includes." sections:@[
-        SGSection(nil, @[mod]),
+    return [[SGModPage alloc] initWithTitle:@"Licenses" intro:@"Glassify is a GPL-3.0 fork of spoti.pw, with code from others it includes." sections:@[
+        SGSection(nil, @[glassify, mod]),
         SGNotedSection(nil, @[bs2b], [@"Copyright (c) 2005 Boris Mikhaylov\n\n" stringByAppendingString:kMIT]),
         SGNotedSection(nil, @[wdl], [@"Copyright (C) 2004-2013 Cockos Incorporated\nCopyright (C) 1999-2003 Nullsoft, Inc.\n\n"
                                      stringByAppendingString:kZlib]),

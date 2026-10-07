@@ -148,7 +148,7 @@ NSArray<SGLyricsProvider *> *SGLyricsAllProviders(void) {
             provider.detail = detail;
             // A source that matches by Spotify's own track id has everything it needs from the
             // start; the rest wait for the player to name the track before they can search.
-            provider.needsName = ![key isEqualToString:@"musixmatch"];
+            provider.needsName = ![key isEqualToString:@"musixmatch"] && ![key isEqualToString:@"spicylyrics"];
             provider.ask = ask;
             return provider;
         };
@@ -158,6 +158,7 @@ NSArray<SGLyricsProvider *> *SGLyricsAllProviders(void) {
             make(@"unison", @"Unison", @"Hand-timed, few tracks", SGUnisonAsk),
             make(@"netease", @"NetEase", @"Word timing, censored", SGNetEaseAsk),
             make(@"lrclib", @"LRCLIB", @"Line timing, open fallback", SGLrcLibAsk),
+            make(@"spicylyrics", @"Spicy Lyrics", @"Community word timing, your key, Redesigned UI", SGSpicyLyricsAsk),
         ];
     });
     return all;
@@ -327,6 +328,28 @@ static void finish(SGLyricsWalk *walk) {
     for (void (^done)(SGLyricsResult *) in waiting) done(lyrics);
 }
 
+// The credits a source's terms require to be shown, each with its link (NSNull for none). A credit is
+// the source's own text, so the view can ask about the one it was handed without knowing the track.
+static NSMutableDictionary<NSString *, id> *sg_requiredCredits;
+
+static void requireCredit(NSString *credit, NSURL *link) {
+    setUp();
+    @synchronized (sg_credits) {
+        if (!sg_requiredCredits) sg_requiredCredits = [NSMutableDictionary dictionary];
+        if (sg_requiredCredits.count >= kKeptTracks) [sg_requiredCredits removeAllObjects];
+        sg_requiredCredits[credit] = link ?: (id)NSNull.null;
+    }
+}
+
+BOOL SGLyricsCreditRequired(NSString *credit, NSURL **link) {
+    if (!credit.length) return NO;
+    setUp();
+    id found;
+    @synchronized (sg_credits) { found = sg_requiredCredits[credit]; }
+    if (link) *link = [found isKindOfClass:NSURL.class] ? found : nil;
+    return found != nil;
+}
+
 static void step(SGLyricsWalk *walk) {
     SGLyricsQuery *query = walk.query;
     SGLyricsResult *merged = walk.merged;
@@ -367,7 +390,8 @@ static void step(SGLyricsWalk *walk) {
         if (betterLines(merged, fresh)) {
             merged.karaokeLines = fresh.karaokeLines;
             merged.wordTimed = fresh.wordTimed;
-            merged.provider = provider.name;
+            merged.provider = fresh.credit.length ? fresh.credit : provider.name;
+            if (fresh.credit.length) requireCredit(fresh.credit, fresh.creditLink);
         }
         if (betterTexts(merged, fresh)) {
             merged.starts = fresh.starts;

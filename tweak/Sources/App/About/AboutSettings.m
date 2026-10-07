@@ -32,24 +32,19 @@ static SGModRow *withSymbol(SGModRow *row, NSString *symbol) {
     return row;
 }
 
-// Which build this is, whether GitHub has a newer release, and where to reach the mod: without these
-// rows a build that is already installed has no way of telling its user that anything moved on.
+// Which build this is, its licences, the tour, the settings backup and the reset.
 UIViewController *SGAboutPage(void) {
     SGModRow *reset = withSymbol(SGActionRow(@"Reset all settings", nil, ^{ confirmReset(); }), @"trash");
     reset.color = SGRed();
     NSString *spotify = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"] ?: @"unknown";
-    // The row reads out where the build stands and opens the changelog of everything newer than it.
-    SGModRow *updates = SGPageRow(@"Updates", ^UIViewController *{ return SGUpdatePage(); });
-    updates.value = ^NSString *{ return SGUpdateStatus(); };
-    return [[SGModPage alloc] initWithTitle:@"Mod" intro:nil sections:@[
+    // Glassify is a personal build: no update check, no links out. Licenses stays, it carries the notices the
+    // code and what it bundles are under.
+    return [[SGModPage alloc] initWithTitle:@"About" intro:nil sections:@[
         SGSection(nil, @[
-            updates,
-            SGStatRow(@"Version", ^NSString *{ return @(SG_VERSION); }),
+            SGStatRow(@"Glassify", ^NSString *{ return @(SG_VERSION); }),
             SGStatRow(@"Spotify", ^NSString *{ return spotify; }),
         ]),
         SGSection(nil, @[
-            withSymbol(SGLinkRow(@"Website", nil, SGSiteURL), @"safari"),
-            withSymbol(SGLinkRow(@"GitHub", nil, SGRepoURL), @"chevron.left.forwardslash.chevron.right"),
             withSymbol(SGPageRow(@"Licenses", ^UIViewController *{ return SGLicensesPage(); }), @"doc.text"),
             withSymbol(SGActionRow(@"Welcome tour", nil, ^{ SGShowOnboarding(); }), @"map"),
         ]),

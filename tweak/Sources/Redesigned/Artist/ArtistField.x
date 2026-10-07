@@ -51,11 +51,35 @@ void SGRArtistSetArtwork(UIView *view, UIImage *image) {
     if (image) [fieldOn(view) setArtwork:image identity:nil animated:YES];
 }
 
+// The soft top edge (Kit/SGREdgeEffect.x) blurs whatever is under the status bar, which here is the top of
+// the artist's photo, the Music app's sharp. Spotify's own bar, drawn once the page has scrolled, keeps the
+// status bar clear from there, so the edge goes on the page's lists, taller than half the page.
+static void clearTopEdge(UIView *page) {
+    if (@available(iOS 26.0, *)) {
+        NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:page];
+        for (NSUInteger at = 0; at < queue.count && at < 300; at++) {
+            UIView *v = queue[at];
+            if ([v isKindOfClass:UIScrollView.class] && v.bounds.size.height > page.bounds.size.height / 2) {
+                UIScrollEdgeEffect *top = ((UIScrollView *)v).topEdgeEffect;
+                if (!top.hidden) {
+                    top.hidden = YES;
+                    static dispatch_once_t once;
+                    dispatch_once(&once, ^{ SGLog(@"redesign artist: top edge blur off over the photo (%@)", NSStringFromClass(v.class)); });
+                }
+                continue;   // its cells' own scroll views are not the page's
+            }
+            [queue addObjectsFromArray:v.subviews];
+        }
+    }
+}
+
 static SGRArtworkField *fieldIn(UIView *page) {
     SGRArtworkField *field = objc_getAssociatedObject(page, &kFieldKey);
     if (field) return field;
     field = [[SGRArtworkField alloc] initWithFrame:page.bounds];
     field.bleed = kBleed;
+    // The photo's colour the whole way down, the Music app's artist page, rather than fading to black.
+    field.fadesToBlack = NO;
     objc_setAssociatedObject(page, &kFieldKey, field, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     SGLog(@"redesign artist: field on the page %.0fx%.0f", page.bounds.size.width, page.bounds.size.height);
     return field;
@@ -72,6 +96,7 @@ static SGRArtworkField *fieldIn(UIView *page) {
     if (field.superview != page) [page insertSubview:field atIndex:0];
     else if (page.subviews.firstObject != field) [page sendSubviewToBack:field];
     if (!CGRectEqualToRect(field.frame, page.bounds)) field.frame = page.bounds;
+    clearTopEdge(page);
 }
 %end
 

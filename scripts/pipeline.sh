@@ -127,6 +127,24 @@ else
   echo "    no WidgetExtension.appex in this IPA"
 fi
 
+# ALT_ICON_DIR: a folder holding SpotifyIcon60x60@2x.png and @3x.png. With a custom --icon, Spotify's own icon
+# goes in as an alternate named "Spotify", so the app can switch back to it (Mod Settings → App icon).
+if [ -n "${ALT_ICON_DIR:-}" ] && [ -f "$ALT_ICON_DIR/SpotifyIcon60x60@3x.png" ]; then
+  echo "==> adding Spotify's icon as an alternate"
+  ALT="$(mktemp -d)"
+  unzip -q "$OUT" "${APP_DIR}Info.plist" -d "$ALT"
+  cp "$ALT_ICON_DIR"/SpotifyIcon60x60@2x.png "$ALT_ICON_DIR"/SpotifyIcon60x60@3x.png "$ALT/$APP_DIR"
+  PLIST="$ALT/${APP_DIR}Info.plist"
+  for KEY in CFBundleIcons "CFBundleIcons~ipad"; do
+    plutil -extract "$KEY" raw -o - "$PLIST" >/dev/null 2>&1 || continue
+    plutil -remove "$KEY.CFBundleAlternateIcons" "$PLIST" 2>/dev/null || true
+    plutil -insert "$KEY.CFBundleAlternateIcons" -json '{"Spotify":{"CFBundleIconFiles":["SpotifyIcon60x60"]}}' "$PLIST"
+  done
+  OUT_ABS="$(cd "$(dirname "$OUT")" && pwd)/$(basename "$OUT")"
+  (cd "$ALT" && zip -q "$OUT_ABS" "${APP_DIR}Info.plist" "${APP_DIR}SpotifyIcon60x60@2x.png" "${APP_DIR}SpotifyIcon60x60@3x.png")
+  rm -rf "$ALT"
+fi
+
 if [ -n "${EXT_DIR:-}" ]; then
   echo "==> adding the Live Activity intents to Spotify's App Intents metadata"
   "$ROOT/scripts/merge-appintents.py" "$OUT" "$APP_DIR" "$EXT_DIR/app/Metadata.appintents"

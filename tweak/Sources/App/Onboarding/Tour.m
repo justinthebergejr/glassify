@@ -3,7 +3,6 @@
 #import "Onboarding.h"
 #import "App/About/About.h"
 #import "App/Pages.h"
-#import "App/Donate/Donate.h"
 
 static const CGFloat kMargin = 24;
 static const CGFloat kCardRadius = 22;
@@ -159,12 +158,12 @@ static UIButton *glassButton(NSString *title) {
     return self;
 }
 
-// Under the cards while the redesign is picked: it is a beta, and a bug report is the way to help.
+// Under the cards while the redesign is picked: it is a beta. Glassify links nowhere, so no report links.
 - (UIView *)betaNote {
     UIImageView *icon = SGSymbolView(@"exclamationmark.triangle.fill", 15, UIImageSymbolWeightSemibold, 22);
     icon.tintColor = UIColor.systemYellowColor;
     UILabel *text = [UILabel new];
-    text.text = @"The redesign is a beta. Expect lags, freezes and bugs, and if you find one, please report it.";
+    text.text = @"The redesign is a beta. Expect the odd lag, freeze or bug.";
     text.font = [UIFont systemFontOfSize:13];
     text.textColor = SGGrey();
     text.numberOfLines = 0;
@@ -173,16 +172,7 @@ static UIButton *glassButton(NSString *title) {
     line.alignment = UIStackViewAlignmentTop;
     line.spacing = 10;
 
-    UIButtonConfiguration *config = [UIButtonConfiguration plainButtonConfiguration];
-    config.contentInsets = NSDirectionalEdgeInsetsMake(4, 32, 4, 0);
-    config.baseForegroundColor = SGGreen();
-    config.attributedTitle = [[NSAttributedString alloc] initWithString:@"Report a bug" attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:13 weight:UIFontWeightSemibold]}];
-    UIButton *report = [UIButton buttonWithConfiguration:config primaryAction:[UIAction actionWithHandler:^(UIAction *action) {
-        SGOpenURL([SGRepoURL stringByAppendingString:@"/issues"]);
-    }]];
-    report.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeading;
-
-    UIStackView *note = [[UIStackView alloc] initWithArrangedSubviews:@[line, report]];
+    UIStackView *note = [[UIStackView alloc] initWithArrangedSubviews:@[line]];
     note.axis = UILayoutConstraintAxisVertical;
     note.alignment = UIStackViewAlignmentLeading;
     note.spacing = 2;
@@ -315,7 +305,6 @@ static UIButton *glassButton(NSString *title) {
 }
 
 - (void)finish {
-    SGDonateAfterTour(self.needsRestart);
     SGSetEnabled(SGKeyOnboardingSeen, YES);
     SGSetRedesignedUI(_redesigned.selected);
     if (self.needsRestart) {

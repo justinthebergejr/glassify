@@ -4,6 +4,7 @@
 // is a mock the harness drives: SGRHarnessSetTrack reports a track change to every observer.
 #import <UIKit/UIKit.h>
 #import "Shared/Lyrics/Lyrics.h"
+#import "Shared/LyricsMeanings/Meanings.h"
 #import "Headers/SPTPlayer.h"
 #import "Shared/Player/PlayerState.h"
 
@@ -86,6 +87,14 @@ void SGPrepareFeedback(NSInteger feedback) {}
 #pragma mark - Shared/LyricsSources
 
 NSString *SGLyricsCreditFor(NSString *trackID) { return @"the harness"; }
+BOOL SGLyricsCreditRequired(NSString *credit, NSURL **link) { return NO; }
+
+#pragma mark - Shared/LyricsMeanings, Redesigned/Lyrics/MeaningSheet
+
+// Genius is not asked; the lines carry no meanings, as on the phone with the setting off.
+void SGLyricsMeaningsFor(NSString *trackID, NSArray<SGKaraokeLine *> *lines,
+                         void (^done)(NSDictionary<NSNumber *, NSArray<SGLyricsMeaning *> *> *byLine)) {}
+void SGRShowMeanings(NSString *lineText, NSArray<SGLyricsMeaning *> *meanings) {}
 
 #pragma mark - Shared/Lyrics/KaraokeSource.x
 

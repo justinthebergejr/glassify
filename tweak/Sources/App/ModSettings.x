@@ -1,12 +1,12 @@
-// Settings: a Mod Settings row at the end of Spotify's settings list opens the mod's own page: the
-// Appearance card with Redesigned UI, then a page per part of Spotify, each holding what that part
-// offers in the stored look (App/Pages.m: Navbar, Player, and Home & Library for the native look), Audio
-// effects (Shared/AudioEffects, in either look and applying straight away), Privacy & clutter
-// and Labs, All flags, a searchable list of every flag with an override per flag, and Mod, the
-// build, its updates and links. The same row leads the side drawer's list (trees/test6.txt), above
-// Your plan, so the page is a tap from Home, and holding Home on the tab bar opens it too. The tweaks read the switches when they run, so a change
-// shows after Spotify restarts; the tab editor on the Navbar page applies as soon as the bar lays
-// out again.
+// Settings: a Glassify row at the top of Spotify's settings list opens the mod's own page: the
+// Appearance card with Redesigned UI and the app icon, then Features, a page per part of Spotify, each
+// holding what that part offers in the stored look (App/Pages.m: Navbar, Player, and Home & Library for the
+// native look), Audio effects (Shared/AudioEffects, in either look and applying straight away) and the Live
+// Activity; Advanced, Privacy & clutter, Labs and All flags (a searchable list of every flag with an override
+// per flag); and About, the build, its licences, the tour and the settings backup. Holding Home on the tab bar
+// opens it too. This build checks for no updates and asks for nothing: no update notice, no donation sheet, no
+// links out. The tweaks read the switches when they run, so a change shows after Spotify restarts; the tab
+// editor on the Navbar page applies as soon as the bar lays out again.
 //
 // Tree (trees/settings.txt): SettingsListViewController.view > SettingsListCollectionView of
 //   Element_List cells 402x56: 24pt icon at x 12, 13pt white title and 11pt grey subtitle at
@@ -22,7 +22,6 @@
 #import "Shared/AudioEffects/AudioEffectsPage.h"
 #import "Shared/LiveActivity/LiveActivity.h"
 #import "App/About/About.h"
-#import "App/Donate/Donate.h"
 #import "Pages.h"
 
 static const CGFloat kRowHeight = 56;
@@ -33,16 +32,13 @@ static SGModRow *pageRow(NSString *title, NSString *symbol, UIViewController *(^
 }
 
 static UIViewController *modSettingsPage(void) {
-    // Opening the page is the only thing that asks; the cache keeps it to once every six hours.
-    SGCheckForUpdate(NO);
     NSMutableArray<SGModSection *> *sections = [NSMutableArray array];
     // A build the lock screen cannot open leads the page, above the tweaks: it is the one thing here
     // that no switch can put right, and it is worth reading before anything else.
     SGModRow *signing = SGSigningWarningRow();
     if (signing) [sections addObject:SGSection(nil, @[signing])];
-    [sections addObject:SGSection(nil, @[SGDonateRow()])];
-    SGModRow *mod = pageRow(@"Mod", @"info.circle", ^UIViewController *{ return SGAboutPage(); });
-    mod.value = ^NSString *{ return @(SG_VERSION); };
+    SGModRow *about = pageRow(@"About", @"info.circle", ^UIViewController *{ return SGAboutPage(); });
+    about.value = ^NSString *{ return @(SG_VERSION); };
     // The audio effects work on the sound, so both looks have them, with what they are doing beside the chevron.
     SGModRow *audioEffects = pageRow(@"Audio effects", @"slider.vertical.3", ^UIViewController *{ return SGDSPSettingsPage(); });
     audioEffects.value = ^NSString *{ return SGDSPSummary(); };
@@ -61,25 +57,22 @@ static UIViewController *modSettingsPage(void) {
     if (!SGRedesignedUIStored()) [parts addObject:pageRow(@"Home & Library", @"house", ^UIViewController *{ return SGHomeSettingsPage(); })];
     [sections addObjectsFromArray:@[
         SGAppearanceSection(),
-        SGSection(nil, parts),
-        SGSection(nil, @[
+        SGSection(@"Features", parts),
+        SGSection(@"Advanced", @[
             pageRow(@"Privacy & clutter", @"hand.raised", ^UIViewController *{ return SGPrivacySettingsPage(); }),
             pageRow(@"Labs", @"testtube.2", ^UIViewController *{ return SGLabsPage(); }),
-        ]),
-        SGSection(nil, @[
             pageRow(@"All flags", @"flag", ^UIViewController *{ return SGAllFlagsPage(); }),
-            mod,
         ]),
+        SGSection(nil, @[about]),
     ]];
-    return [[SGModPage alloc] initWithTitle:@"spoti.pw" intro:nil sections:sections footer:nil];
+    return [[SGModPage alloc] initWithTitle:@"Glassify" intro:nil sections:sections footer:nil];
 }
 
-#pragma mark - row in the settings list and the side drawer
+#pragma mark - row in the settings list
 
-// The last row of Spotify's settings list, chevron and all, or the first of the side drawer's,
-// drawn like the drawer's own rows: no chevron, icon and title 4pt further in.
+// The first row of Spotify's settings list, drawn like its own rows, chevron and all: the waveform of
+// Glassify's icon, and its name.
 @interface SGModSettingsRow : UIControl
-@property (nonatomic) BOOL drawer;
 @end
 
 @implementation SGModSettingsRow {
@@ -90,9 +83,9 @@ static UIViewController *modSettingsPage(void) {
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (!(self = [super initWithFrame:frame])) return nil;
-    _icon = SGSymbolView(@"slider.horizontal.3", 20, UIImageSymbolWeightRegular, 24);
+    _icon = SGSymbolView(@"waveform", 20, UIImageSymbolWeightRegular, 24);
     _title = [UILabel new];
-    _title.text = @"Mod Settings";
+    _title.text = @"Glassify";
     _title.textColor = UIColor.whiteColor;
     _chevron = SGSymbolView(@"chevron.right", 11, UIImageSymbolWeightSemibold, 12);
     for (UIView *v in @[_icon, _title, _chevron]) [self addSubview:v];
@@ -103,11 +96,10 @@ static UIViewController *modSettingsPage(void) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     _title.font = SGTitleFont();
-    CGFloat width = self.bounds.size.width, height = self.bounds.size.height, lead = self.drawer ? 4 : 0;
-    _icon.frame = CGRectMake(12 + lead, (height - 24) / 2, 24, 24);
-    _title.frame = CGRectMake(48 + lead, 0, width - 96, height);
+    CGFloat width = self.bounds.size.width, height = self.bounds.size.height;
+    _icon.frame = CGRectMake(12, (height - 24) / 2, 24, 24);
+    _title.frame = CGRectMake(48, 0, width - 96, height);
     _chevron.frame = CGRectMake(width - 24, (height - 12) / 2, 12, 12);
-    _chevron.hidden = self.drawer;
 }
 
 - (void)setHighlighted:(BOOL)highlighted {
@@ -124,21 +116,12 @@ static UINavigationController *navigationIn(UIViewController *page) {
     return nil;
 }
 
-// The drawer is presented over the app, so its row closes it first and pushes onto the stack it
-// was covering, the way the drawer's own rows open their pages.
 - (void)open {
     UIViewController *owner = nil;
     for (UIResponder *r = self; r && !owner; r = r.nextResponder) {
         if ([r isKindOfClass:UIViewController.class]) owner = (UIViewController *)r;
     }
-    UIViewController *presenting = self.drawer ? owner.presentingViewController : nil;
-    if (!presenting) {
-        SGShowPage(owner, modSettingsPage());
-        return;
-    }
-    [presenting dismissViewControllerAnimated:YES completion:^{
-        SGShowPage(navigationIn(presenting).topViewController ?: presenting, modSettingsPage());
-    }];
+    SGShowPage(owner, modSettingsPage());
 }
 
 @end
@@ -154,21 +137,21 @@ void SGOpenModSettings(UIView *source) {
     SGShowPage(nav.topViewController ?: SGTopController(), modSettingsPage());
 }
 
-// At the end of the settings list, or above the first row of the drawer's, with the inset for it
-// added again whenever Spotify resets the inset.
+// Above the settings list's first row, in room added to its top inset, added again whenever Spotify resets
+// the inset. A list resting at its top follows the new inset, so the row shows rather than scrolling off.
 static void placeRow(UICollectionView *list, SGModSettingsRow *row) {
     SGAdoptFonts(list, row);
-    CGFloat bottom = list.contentSize.height;
-    row.hidden = !row.drawer && bottom <= 0;
-    row.frame = CGRectMake(0, row.drawer ? -kRowHeight : bottom, list.bounds.size.width, kRowHeight);
+    row.hidden = list.contentSize.height <= 0;
+    row.frame = CGRectMake(0, -kRowHeight, list.bounds.size.width, kRowHeight);
 
     UIEdgeInsets inset = list.contentInset;
     NSValue *applied = objc_getAssociatedObject(list, &kInsetKey);
     if (applied && UIEdgeInsetsEqualToEdgeInsets(inset, applied.UIEdgeInsetsValue)) return;
-    if (row.drawer) inset.top += kRowHeight;
-    else inset.bottom += kRowHeight;
+    BOOL atTop = list.contentOffset.y <= -list.adjustedContentInset.top + 1;
+    inset.top += kRowHeight;
     objc_setAssociatedObject(list, &kInsetKey, [NSValue valueWithUIEdgeInsets:inset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     list.contentInset = inset;
+    if (atTop) list.contentOffset = CGPointMake(list.contentOffset.x, -list.adjustedContentInset.top);
 }
 
 // Media quality, Playback, Account and most of the rest of settings are the same controller class
@@ -218,22 +201,6 @@ static BOOL isSettingsRoot(UIViewController *list) {
 }
 %end
 
-// The drawer's list (trees/test6.txt: SideDrawerListCollectionView under the profile header, Your
-// plan its first cell) is one of several collection views on the page, so it is found by name.
-%hook _TtC23SideDrawer_ListPageImpl18ListViewController
-- (void)viewDidLayoutSubviews {
-    %orig;
-    SGForEachView(((UIViewController *)self).view, ^(UIView *v) {
-        if (![v isKindOfClass:UICollectionView.class] || ![NSStringFromClass(v.class) containsString:@"SideDrawerListCollectionView"]) return;
-        if (objc_getAssociatedObject(v, &kRowKey)) return;
-        SGModSettingsRow *row = [[SGModSettingsRow alloc] initWithFrame:CGRectZero];
-        row.drawer = YES;
-        objc_setAssociatedObject(v, &kRowKey, row, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        [v addSubview:row];
-    });
-}
-%end
-
 // The lists lay out after their controllers and again whenever their content changes.
 %hook UICollectionView
 - (void)layoutSubviews {
@@ -245,9 +212,7 @@ static BOOL isSettingsRoot(UIViewController *list) {
 
 %ctor {
     %init;
-    SGRequireClasses(@[@"_TtC21Settings_PlatformImpl26SettingsListViewController", @"_TtC23SideDrawer_ListPageImpl18ListViewController"]);
+    SGRequireClasses(@[@"_TtC21Settings_PlatformImpl26SettingsListViewController"]);
     SGRegisterPages();
     SGCheckSigningOnce();
-    SGWatchForUpdates();
-    SGWatchForDonate();
 }

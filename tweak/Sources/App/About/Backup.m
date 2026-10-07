@@ -37,7 +37,7 @@ void SGExportSettings(void) {
         @"settings": settings,
     };
     NSData *data = [NSJSONSerialization dataWithJSONObject:file options:NSJSONWritingPrettyPrinted | NSJSONWritingSortedKeys error:nil];
-    NSURL *url = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"spotifyglass-settings.json"]];
+    NSURL *url = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"glassify-settings.json"]];
     [data writeToURL:url atomically:YES];
 
     UIViewController *top = SGTopController();
