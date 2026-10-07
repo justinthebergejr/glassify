@@ -95,6 +95,12 @@ Shared:
                   for it and the next, and the player's card-loading timeout flag is forced to its 5 s maximum while a
                   source is on
     LockScreenLyrics/ the line being sung in the system's now playing
+    AnimatedArtwork/ video clips for a track's artwork (AnimatedArtwork.h): the track's own canvas from its metadata, or
+                  the album's animated cover from Apple Music's catalog API with the web player's token, its HLS
+                  playlist read down to the one MP4 under it; downloaded into a capped cache, cut to shape and
+                  gated on Spotify's own Data Saver (DataSaver.x). On iOS 26 the clip is the lock screen's animated
+                  artwork, added to every now playing dictionary Spotify sets (LockScreenArtwork.x); its switch
+                  and its sources sit on the Lock screen widget page and apply from the next track
     Navigation/   the page transition fix (PageTransition.x) and opening a spotify: link (Links.x)
     Player/       the player's open and close announced (PlayerEvents.x), what the player is doing read through
                   one hook for every feature that wants it (PlayerState.x), the lock screen widget's flags, and in the

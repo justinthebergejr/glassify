@@ -16,7 +16,8 @@
 //               (a sublayerTransform does not move it), and faded in over the first part of the growth;
 //   the bar     Spotify's stand-in riding the sheet's top edge, gone by a quarter of the way;
 //   the cover   a copy flown from the card's artwork to the player's cover, moved within the sheet,
-//               the player's own cover and shadow hidden meanwhile.
+//               the player's own cover and shadow hidden meanwhile; with a live cover playing it
+//               crossfades with the clip near the player's end (PlayerLiveCover.x).
 // All of it is taken down in -destroyTransitioningContext, which Spotify calls from -animationEnded:.
 //
 // Skipped on a regular width (Spotify's iPad branch), with Reduce Motion on, or while the bar has no
@@ -193,6 +194,8 @@ static CGFloat screenRadius(void) {
                 self->_cover.frame = CGRectOffset(lerpRect(from, to, t), sheet.origin.x, sheet.origin.y);
                 self->_cover.layer.cornerRadius = lerp(from.size.width / 2, SGRRadiusArtwork * scale, t);
             }
+            // Near the player's end the live cover, where there is one, takes over from the flown one.
+            self->_cover.alpha = 1 - SGRPlayerLiveCoverMorph(t);
         }
     }];
     [CATransaction commit];

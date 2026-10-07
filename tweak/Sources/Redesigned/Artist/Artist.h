@@ -12,6 +12,7 @@
 //                       SGRHeaderInfo over it -- the name, the listeners, shuffle, a white Play and Follow
 //     ArtistSections.x  the sections the Music list carries that are not the artist's music: its videos
 //     ArtistFollow.x    whether the artist is followed, from Spotify's collection, for Follow's glyph
+//     ArtistLogo.m      the artist's logo from Apple Music in place of the name, where the artist has one
 //
 // Every hook installs only while Redesigned UI is on (SGRedesignedUI); the native look's do not then.
 // Threading: main thread only.
@@ -31,3 +32,12 @@ void SGRArtistSetArtwork(UIView *view, UIImage *image);
 // the answer; NO until then. The first call subscribes for the page's lifetime, and `changed` runs on the
 // main thread whenever the answer changes.
 BOOL SGRArtistFollowing(UIView *page, NSString *moreIdentifier, BOOL *following, void (^changed)(void));
+
+// ArtistLogo.m. The wordmark Apple Music sets on its artist pages drawn in place of the name (on until
+// switched off; the row is on the Appearance card, App/Pages.m).
+#define SGRKeyArtistLogos @"spotifyglass.redesign.artist.logos"
+@class SGModRow;
+SGModRow *SGRArtistLogosRow(void);
+// The logo of the artist named `name`, on the main queue: nil when the switch is off, the artist has none,
+// or it could not be read. Each artist is asked once a launch; pictures are kept while memory allows.
+void SGRArtistLogo(NSString *name, void (^done)(UIImage *logo));

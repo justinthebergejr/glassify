@@ -43,10 +43,16 @@ SGRArtworkField *SGRPlayerField(void) {
 
 #pragma mark - the field
 
+// The live cover's frame while it plays in the cover's place (PlayerLiveCover.x), so the colours match the
+// clip; the cover's picture otherwise.
 static void showArtwork(SGRArtworkField *field, BOOL animated) {
     NSString *identity = nil;
-    UIImage *image = SGRNowPlayingArtwork(NULL, &identity);
+    UIImage *image = SGRPlayerLiveCoverFrame(&identity) ?: SGRNowPlayingArtwork(NULL, &identity);
     if (field && image) [field setArtwork:image identity:identity animated:animated];
+}
+
+void SGRPlayerFieldRefresh(void) {
+    showArtwork(sg_field, YES);
 }
 
 static SGRArtworkField *fieldIn(UIView *plane) {
@@ -78,6 +84,7 @@ static SGRArtworkField *fieldIn(UIView *plane) {
     if (field.superview != plane) [plane addSubview:field];
     else if (plane.subviews.lastObject != field) [plane bringSubviewToFront:field];
     if (!CGRectEqualToRect(field.frame, plane.bounds)) field.frame = plane.bounds;
+    SGRPlayerLiveCoverLayIn(field);
 }
 
 - (void)backgroundViewModel:(id)model didChangeColor:(id)color playerState:(id)state {

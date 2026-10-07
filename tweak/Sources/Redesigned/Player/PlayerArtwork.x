@@ -103,10 +103,12 @@ CGRect SGRPlayerArtworkAreaIn(UIView *host) {
 
 // The cover hidden for a stand-in, so the same one comes back if the list moved on meanwhile.
 static __weak UIView *sg_hiddenCover, *sg_hiddenPlate;
+// Every cover hidden behind the live cover (PlayerLiveCover.x).
+static BOOL sg_coverMuted;
 
 void SGRPlayerSetCoverHidden(BOOL hidden) {
-    sg_hiddenCover.alpha = 1;
-    sg_hiddenPlate.alpha = 1;
+    sg_hiddenCover.alpha = sg_coverMuted ? 0 : 1;
+    sg_hiddenPlate.alpha = sg_coverMuted ? 0 : 1;
     sg_hiddenCover = sg_hiddenPlate = nil;
     if (!hidden) return;
     UIView *tilt = showingTilt();
@@ -117,6 +119,23 @@ void SGRPlayerSetCoverHidden(BOOL hidden) {
     plate.alpha = 0;
     sg_hiddenCover = cover;
     sg_hiddenPlate = plate;
+}
+
+void SGRPlayerSetCoverMuted(BOOL muted, BOOL animated) {
+    if (muted == sg_coverMuted) return;
+    sg_coverMuted = muted;
+    NSArray<UIView *> *tilts = sg_tilts.allObjects;
+    void (^apply)(void) = ^{
+        for (UIView *tilt in tilts) {
+            UIView *cover = coverIn(tilt);
+            // A cover a stand-in is flying for stays hidden; it comes back muted or not.
+            if (!cover || cover == sg_hiddenCover) continue;
+            cover.alpha = muted ? 0 : 1;
+            SGRShadowPlateIn(tilt, &kPlateKey).alpha = muted ? 0 : 1;
+        }
+    };
+    if (animated) SGRAnimate(SGRMotionFade, apply, nil);
+    else apply();
 }
 
 #pragma mark - the paused shrink
@@ -153,6 +172,11 @@ static void scaleEveryCover(BOOL animated) {
     plate.center = cover.center;
     // The same value an animation in flight is heading to, so a layout pass never cuts one short.
     scaleCover(tilt, currentScale());
+    // A cell laid out while the live cover shows (the next track's, swiped in) comes in hidden too.
+    if (sg_coverMuted && cover != sg_hiddenCover) {
+        cover.alpha = 0;
+        plate.alpha = 0;
+    }
 
     static dispatch_once_t once;
     dispatch_once(&once, ^{ SGLog(@"redesign player: cover %@ rounded %.0f with a shadow plate, scale %.2f", NSStringFromClass(cover.class), SGRRadiusArtwork, currentScale()); });

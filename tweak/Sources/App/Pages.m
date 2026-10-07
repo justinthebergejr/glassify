@@ -17,6 +17,7 @@
 #import "Redesigned/Navbar/Navbar.h"
 #import "Redesigned/NowPlayingBar/NowPlayingBar.h"
 #import "Redesigned/Kit/SGRAccent.h"
+#import "Redesigned/Artist/Artist.h"
 
 NSString *const SGRedesignedUIInfo = @"The newest version of Glassify, leaning towards Apple Music's style. It is not compatible with the legacy look's settings.\n\nThe legacy look gives you more freedom, yet still looks like Spotify.";
 
@@ -97,6 +98,7 @@ SGModSection *SGAppearanceSection(void) {
     };
     NSMutableArray<SGModRow *> *rows = [NSMutableArray arrayWithObject:SGWithSymbol(redesign, @"sparkles")];
     [rows addObjectsFromArray:SGRedesignedUIStored() ? SGRAppearanceRows() : SGNativeAppearanceRows()];
+    if (SGRedesignedUIStored()) [rows addObject:SGRArtistLogosRow()];
     if (icon) [rows addObject:icon];
     return SGNotedSection(@"Appearance", rows, @"Changes apply after you restart Spotify.");
 }

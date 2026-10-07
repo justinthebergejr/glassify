@@ -58,6 +58,13 @@ Glassify is spoti.pw's GPL-3.0 code, with:
 
 **Added**
 
+- **Live cover**: the album's animated cover from Apple Music, or the track's Canvas, plays at the top
+  of the player, with the background colours following it and a crossfade as you swipe the player down.
+  Choose and order the sources on the Now playing page; Apple Music comes first by default.
+- **Animated lock screen artwork** from the same sources, in an order of its own on the Lock screen
+  widget page, with the next
+  track's clip fetched ahead so it starts as the song does.
+- **Artist logos** from Apple Music in place of the name on artist pages, where one exists.
 - **Spicy Lyrics** as a lyrics source: the community's word-by-word syncs, then Apple Music's and
   Spotify's. Bring your own free publishable key from
   [developers.spicylyrics.org](https://developers.spicylyrics.org/) (allow requests without an origin)
@@ -76,10 +83,9 @@ Glassify is spoti.pw's GPL-3.0 code, with:
 - The update checker and the usage report it sent to spoti.pw's server, the donation prompts, and the
   links to spoti.pw's site, Discord and GitHub.
 
-**Not included**
-
-- spoti.pw's animated lock screen artwork arrived after its license change, so it is not part of
-  Glassify, along with anything built on it.
+spoti.pw's own animated lock screen artwork arrived after its license change and is not part of
+Glassify. The lock screen artwork, live cover and artist logos here were written independently, without
+reference to that code.
 
 ## Build it
 

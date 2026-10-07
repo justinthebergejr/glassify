@@ -328,25 +328,25 @@ static void finish(SGLyricsWalk *walk) {
     for (void (^done)(SGLyricsResult *) in waiting) done(lyrics);
 }
 
-// The credits a source's terms require to be shown, each with its link (NSNull for none). A credit is
+// The credits a source's terms require to be shown, each with its links (an empty array for none). A credit is
 // the source's own text, so the view can ask about the one it was handed without knowing the track.
 static NSMutableDictionary<NSString *, id> *sg_requiredCredits;
 
-static void requireCredit(NSString *credit, NSURL *link) {
+static void requireCredit(NSString *credit, NSArray<NSDictionary *> *links) {
     setUp();
     @synchronized (sg_credits) {
         if (!sg_requiredCredits) sg_requiredCredits = [NSMutableDictionary dictionary];
         if (sg_requiredCredits.count >= kKeptTracks) [sg_requiredCredits removeAllObjects];
-        sg_requiredCredits[credit] = link ?: (id)NSNull.null;
+        sg_requiredCredits[credit] = links ?: @[];
     }
 }
 
-BOOL SGLyricsCreditRequired(NSString *credit, NSURL **link) {
+BOOL SGLyricsCreditRequired(NSString *credit, NSArray<NSDictionary *> **links) {
     if (!credit.length) return NO;
     setUp();
     id found;
     @synchronized (sg_credits) { found = sg_requiredCredits[credit]; }
-    if (link) *link = [found isKindOfClass:NSURL.class] ? found : nil;
+    if (links) *links = [found isKindOfClass:NSArray.class] && [found count] ? found : nil;
     return found != nil;
 }
 
@@ -391,7 +391,7 @@ static void step(SGLyricsWalk *walk) {
             merged.karaokeLines = fresh.karaokeLines;
             merged.wordTimed = fresh.wordTimed;
             merged.provider = fresh.credit.length ? fresh.credit : provider.name;
-            if (fresh.credit.length) requireCredit(fresh.credit, fresh.creditLink);
+            if (fresh.credit.length) requireCredit(fresh.credit, fresh.creditLinks);
         }
         if (betterTexts(merged, fresh)) {
             merged.starts = fresh.starts;

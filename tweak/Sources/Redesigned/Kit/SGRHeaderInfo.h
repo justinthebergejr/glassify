@@ -22,6 +22,9 @@ extern const CGFloat SGRHeaderInfoTitleRise;  // 56, of the content over the pic
 @interface SGRHeaderInfo : UIView
 // YES when anything shown changed. nil or empty hides that line.
 - (BOOL)showTitle:(NSString *)title creator:(NSString *)creator length:(NSString *)length about:(NSString *)about;
+// A picture drawn in the title's place (the artist's logo), the title kept as what VoiceOver reads; nil
+// puts the title back. The swap crossfades when `animated`. YES when it changed.
+- (BOOL)showTitleImage:(UIImage *)image animated:(BOOL)animated;
 // Spotify's own control behind the creator line -- the album's artist row, the playlist's collaborators
 // button -- so a tap on the line opens whoever made it, and several of them open Spotify's own picker.
 // The line keeps its colour: it is the page's one piece of secondary text, not a link to be tinted. nil

@@ -40,7 +40,7 @@
 // For a source whose terms require attribution (Spicy Lyrics): the credit to show in the source's own
 // words, and where tapping it goes. The view shows such a credit whatever Show source says.
 @property (nonatomic, copy) NSString *credit;
-@property (nonatomic, copy) NSURL *creditLink;
+@property (nonatomic, copy) NSArray<NSDictionary *> *creditLinks;   // {name, role, url}, the profiles to link
 @end
 
 // What is known about the track when a source is asked. Only trackID is always there; the rest is
@@ -99,7 +99,7 @@ NSString *SGLyricsCreditFor(NSString *trackID);
 void SGLyricsSetCredit(NSString *trackID, NSString *name);
 // Whether a credit (as SGLyricsCreditFor answers it) must stay on screen, with the page tapping it opens,
 // nil for none; a credit no source required attribution for answers NO. Safe from any thread.
-BOOL SGLyricsCreditRequired(NSString *credit, NSURL **link);
+BOOL SGLyricsCreditRequired(NSString *credit, NSArray<NSDictionary *> **links);
 // Turns an install's old Musixmatch switches into an order. Called once, before anything reads one.
 void SGLyricsMigrateLegacyKeys(void);
 

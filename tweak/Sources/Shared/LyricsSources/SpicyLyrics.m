@@ -4,9 +4,10 @@
 //   - a key is one person's and may not be shared or published, so the mod ships none: the user makes a
 //     publishable one (sl_pk_, with requests without an Origin allowed, which is what an app sends) and
 //     pastes it on the Lyrics page;
-//   - attribution is a condition of use and goes wherever the lyrics are, a community sync crediting and
-//     linking its uploader and maker. Only the redesign's lyrics view can show that, so the source answers
-//     only under Redesigned UI, and the view shows its credit whatever Show source says (SGLyricsCreditLink);
+//   - attribution is a condition of use and goes wherever the lyrics are, never behind a setting: the
+//     provider for Apple Music's and Spotify's lines, and for a community sync Spicy Lyrics with its maker
+//     and uploader linked. Only the redesign's lyrics view can show that, so the source answers only under
+//     Redesigned UI, and the view shows its credit whatever Show source says (SGLyricsCreditRequired);
 //   - answers may be kept 30 days at most; the chain keeps them for the session only.
 //
 // The answer's Body is one of three shapes, times in seconds:
@@ -143,21 +144,29 @@ static NSURL *linkOf(id person) {
     return url.length ? [NSURL URLWithString:url] : nil;
 }
 
-// The credit the terms ask for: the provider that answered, and for a community sync who uploaded it and
-// who made it, the uploader's page as the link.
-static NSString *creditFor(NSDictionary *body, NSURL **link) {
+// The credit the terms ask for (developers.spicylyrics.org/docs/attribution): for Apple Music's or Spotify's
+// lines the provider only, "Apple Music"; for a community sync Spicy Lyrics with its maker and its uploader,
+// each linked, "Spicy Lyrics • maker, uploader", the uploader left out when it is the same person. `links`
+// gets one {name, url} per person with a profile, the maker first.
+static NSString *creditFor(NSDictionary *body, NSArray<NSDictionary *> **links) {
     NSString *source = textOf(body[@"source"]);
-    if ([source isEqualToString:@"apple_music"]) return @"Spicy Lyrics, from Apple Music";
-    if ([source isEqualToString:@"spotify"]) return @"Spicy Lyrics, from Spotify";
+    *links = nil;
+    if ([source isEqualToString:@"apple_music"]) return @"Apple Music";
+    if ([source isEqualToString:@"spotify"]) return @"Spotify";
     id attribution = body[@"UploadAttribution"];
     NSDictionary *people = [attribution isKindOfClass:NSDictionary.class] ? attribution : nil;
     NSString *uploader = nameOf(people[@"Uploader"]), *maker = nameOf(people[@"Maker"]);
-    *link = linkOf(people[@"Uploader"]) ?: linkOf(people[@"Maker"]);
-    // Both names kept, as the terms require, without the words around them: "Spicy Lyrics · uploader, maker".
     NSMutableArray<NSString *> *names = [NSMutableArray array];
-    if (uploader.length) [names addObject:uploader];
-    if (maker.length && ![maker isEqualToString:uploader]) [names addObject:maker];
-    return names.count ? [NSString stringWithFormat:@"Spicy Lyrics · %@", [names componentsJoinedByString:@", "]] : @"Spicy Lyrics";
+    NSMutableArray<NSDictionary *> *linked = [NSMutableArray array];
+    void (^credit)(NSString *, NSURL *, NSString *) = ^(NSString *name, NSURL *url, NSString *role) {
+        if (!name.length || [names containsObject:name]) return;
+        [names addObject:name];
+        if (url) [linked addObject:@{@"name": name, @"role": role, @"url": url}];
+    };
+    credit(maker, linkOf(people[@"Maker"]), @"made the sync");
+    credit(uploader, linkOf(people[@"Uploader"]), @"uploaded it");
+    *links = linked.count ? linked : nil;
+    return names.count ? [NSString stringWithFormat:@"Spicy Lyrics • %@", [names componentsJoinedByString:@", "]] : @"Spicy Lyrics";
 }
 
 SGLyricsAsk SGSpicyLyricsAsk = ^(SGLyricsQuery *query, void (^done)(SGLyricsResult *result)) {
@@ -193,9 +202,9 @@ SGLyricsAsk SGSpicyLyricsAsk = ^(SGLyricsQuery *query, void (^done)(SGLyricsResu
         result.wordTimed = SGKaraokeLinesTiming(lines) == SGKaraokeTimingWords;
         result.synced = SGKaraokeLinesTiming(lines) != SGKaraokeTimingNone;
         // No text for Spotify's own page: the credit can only be shown in the redesign's view.
-        NSURL *link = nil;
-        result.credit = creditFor(body, &link);
-        result.creditLink = link;
+        NSArray<NSDictionary *> *links = nil;
+        result.credit = creditFor(body, &links);
+        result.creditLinks = links;
         done(result);
     });
 };

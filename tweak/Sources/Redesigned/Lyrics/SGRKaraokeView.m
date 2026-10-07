@@ -1071,7 +1071,7 @@ typedef struct {
     CGFloat _fontSize, _margin, _lineGap, _blurPerLine, _maxBlur;
     BOOL _crediting;   // the switch is read once: the page asks for the source on every frame until it has one
     NSString *_creditSource;   // the source last asked about, so a credit not shown is not looked up every frame
-    NSURL *_creditLink;        // where tapping the credit goes, for a source whose terms ask for one
+    NSArray<NSDictionary *> *_creditLinks;   // {name, role, url}: the profiles tapping the credit opens, for a source whose terms ask for them
     double _clock;
     NSInteger _reported;
     CFTimeInterval _clockTime;
@@ -1133,9 +1133,9 @@ typedef struct {
 
 - (void)tapped:(UITapGestureRecognizer *)tap {
     if (_extras && !_extras.hidden && CGRectContainsPoint(_extras.frame, [tap locationInView:self])) return;
-    // A credit with a link (a community sync's uploader) opens it.
-    if (_creditLink && !_credit.hidden && CGRectContainsPoint(CGRectInset(_credit.frame, -8, -10), [tap locationInView:self])) {
-        [UIApplication.sharedApplication openURL:_creditLink options:@{} completionHandler:nil];
+    // A credit with profiles (a community sync's maker and uploader) opens the one, or asks which of the two.
+    if (_creditLinks.count && !_credit.hidden && CGRectContainsPoint(CGRectInset(_credit.frame, -8, -10), [tap locationInView:self])) {
+        [self openCreditLinks];
         return;
     }
     CGPoint point = [tap locationInView:_scroll];
@@ -1610,11 +1610,32 @@ typedef struct {
     _dots.frame = CGRectMake(_margin, top, _builtWidth - 2 * _margin, _dots.bounds.size.height);
 }
 
+- (void)openCreditLinks {
+    NSArray<NSDictionary *> *links = _creditLinks;
+    if (links.count == 1) {
+        [UIApplication.sharedApplication openURL:links.firstObject[@"url"] options:@{} completionHandler:nil];
+        return;
+    }
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:_credit.text message:nil
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    for (NSDictionary *link in links) {
+        NSString *title = [NSString stringWithFormat:@"%@ · %@", link[@"name"], link[@"role"]];
+        [sheet addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [UIApplication.sharedApplication openURL:link[@"url"] options:@{} completionHandler:nil];
+        }]];
+    }
+    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    sheet.popoverPresentationController.sourceView = _credit;
+    UIViewController *top = self.window.rootViewController;
+    while (top.presentedViewController) top = top.presentedViewController;
+    [top presentViewController:sheet animated:YES completion:nil];
+}
+
 - (void)creditTo:(NSString *)source {
     _creditSource = source;
-    NSURL *link = nil;
-    BOOL required = SGLyricsCreditRequired(source, &link);
-    _creditLink = required ? link : nil;
+    NSArray<NSDictionary *> *links = nil;
+    BOOL required = SGLyricsCreditRequired(source, &links);
+    _creditLinks = required ? links : nil;
     NSString *text = source.length && (_crediting || required) ? [NSString stringWithFormat:@"Lyrics from %@", source] : nil;
     if (text == _credit.text || [text isEqualToString:_credit.text]) return;
     _credit.text = text;

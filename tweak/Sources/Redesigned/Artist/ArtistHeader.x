@@ -38,7 +38,7 @@ static const CGFloat kMinCover = 80, kMinHero = 120;
 // The collapsed ImageHeaderView, Spotify's navigation bar; the text fades out over the last kFade before it.
 static const CGFloat kBar = 100, kFade = 150;
 
-static char kInfoKey, kHeroKey, kHeroHeightKey, kContainerHeightKey, kRowWatchedKey;
+static char kInfoKey, kHeroKey, kHeroHeightKey, kContainerHeightKey, kRowWatchedKey, kLogoNameKey;
 static char kTitleKey, kMetaKey, kShuffleKey, kPlayKey, kFollowKey, kArtworkKey, kBarKey, kMoreKey, kMoreButtonKey;
 
 #pragma mark - Spotify's views
@@ -242,6 +242,27 @@ static UIView *keepBar(UIView *header) {
     return foreground;
 }
 
+static void applyHeader(UIView *header);
+
+// The artist's logo in the name's place, asked once for each name the header shows (ArtistLogo.m). A page
+// that already knows it shows it at once; one that has to fetch it crossfades it in, and the header is laid
+// out again so the photo's dissolve follows the logo's height.
+static void showLogo(UIView *container, UIView *header, SGRHeaderInfo *info, NSString *name) {
+    NSString *asked = objc_getAssociatedObject(container, &kLogoNameKey);
+    if (!name.length || [asked isEqualToString:name]) return;
+    objc_setAssociatedObject(container, &kLogoNameKey, name, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    [info showTitleImage:nil animated:NO];
+    __block BOOL waited = NO;
+    __weak UIView *weakContainer = container, *weakHeader = header;
+    __weak SGRHeaderInfo *weakInfo = info;
+    SGRArtistLogo(name, ^(UIImage *logo) {
+        UIView *page = weakContainer;
+        if (!logo || !page || ![objc_getAssociatedObject(page, &kLogoNameKey) isEqualToString:name]) return;
+        if ([weakInfo showTitleImage:logo animated:waited]) [weakHeader setNeedsLayout];
+    });
+    waited = YES;
+}
+
 static void applyHeader(UIView *header) {
     UIView *container = containerOf(header);
     UIView *artwork = SGRFindByIdentifier(header, @"Components.Header.UI.ArtworkImage", &kArtworkKey);
@@ -274,6 +295,7 @@ static void applyHeader(UIView *header) {
     UIView *listeners = SGRFindByIdentifier(header, @"Components.Header.UI.Metadata", &kMetaKey);
     NSString *name = firstText(title) ?: firstText(bar);
     [info showTitle:name creator:nil length:firstText(listeners) about:nil];
+    showLogo(container, header, info, name);
 
     UIView *shuffle = SGRFindByIdentifier(header, @"Components.UI.ShuffleButton", &kShuffleKey);
     UIView *play = SGRFindByIdentifier(header, @"header-play-button", &kPlayKey);

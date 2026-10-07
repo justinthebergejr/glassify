@@ -11,6 +11,8 @@ const CGFloat SGRHeaderInfoTitleRise = 56;
 
 // The text kSide in from the edges; Play at least kPlayWidth wide, the Music app's; the gaps between.
 static const CGFloat kSide = 20, kPlayWidth = 148, kRowSpacing = 16, kRowAbove = 16, kAboutAbove = 14;
+// A title picture at most this share of the text's width and this tall, the Music app's artist logo.
+static const CGFloat kLogoWidthShare = 0.78, kLogoMaxHeight = 84;
 
 static UILabel *infoLabel(UIView *parent, UIFont *font, UIColor *color, NSInteger lines, NSTextAlignment alignment) {
     UILabel *label = [UILabel new];
@@ -33,6 +35,7 @@ static BOOL setText(UILabel *label, NSString *text) {
 
 @implementation SGRHeaderInfo {
     UILabel *_title, *_creator, *_length, *_about;
+    UIImageView *_logo;
     SGRMirrorButton *_shuffle, *_trailing;
     SGRPlayCapsule *_play;
     __weak UIView *_creatorLink;
@@ -49,6 +52,12 @@ static BOOL setText(UILabel *label, NSString *text) {
                         SGRTertiary(), 1, NSTextAlignmentCenter);
     _about = infoLabel(self, SGRFont(UIFontTextStyleFootnote, UIFontWeightRegular, UIContentSizeCategoryExtraLarge),
                        SGRSecondary(), 2, NSTextAlignmentNatural);
+    _logo = [UIImageView new];
+    _logo.contentMode = UIViewContentModeScaleAspectFit;
+    _logo.hidden = YES;
+    _logo.isAccessibilityElement = YES;
+    _logo.accessibilityTraits = UIAccessibilityTraitHeader;
+    [self addSubview:_logo];
 
     _shuffle = [[SGRMirrorButton alloc] initWithFrame:CGRectZero];
     _shuffle.fallbackGlyph = [UIImage systemImageNamed:@"shuffle"];
@@ -82,8 +91,41 @@ static BOOL setText(UILabel *label, NSString *text) {
     changed |= setText(_creator, creator);
     changed |= setText(_length, length);
     changed |= setText(_about, about);
+    // The picture stands for the title: the label stays hidden under it and lends it its words.
+    _logo.accessibilityLabel = title;
+    if (_logo.image) _title.hidden = YES;
     if (changed) [self setNeedsLayout];
     return changed;
+}
+
+- (BOOL)showTitleImage:(UIImage *)image animated:(BOOL)animated {
+    if (image == _logo.image) return NO;
+    void (^swap)(void) = ^{
+        self->_logo.image = image;
+        self->_logo.hidden = image == nil;
+        self->_title.hidden = image != nil || self->_title.text.length == 0;
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    };
+    if (animated && self.window) {
+        [UIView transitionWithView:self duration:SGRCrossfade options:UIViewAnimationOptionTransitionCrossDissolve
+                        animations:swap completion:nil];
+    } else {
+        swap();
+    }
+    return YES;
+}
+
+// The picture's size in the title's place: as wide as the share allows, no taller than the cap.
+- (CGSize)sgr_logoSizeForText:(CGFloat)text {
+    CGSize image = _logo.image.size;
+    if (_logo.hidden || image.width < 1 || image.height < 1) return CGSizeZero;
+    CGFloat width = text * kLogoWidthShare, height = width * image.height / image.width;
+    if (height > kLogoMaxHeight) {
+        height = kLogoMaxHeight;
+        width = height * image.width / image.height;
+    }
+    return CGSizeMake(round(width), round(height));
 }
 
 // The creator line, tappable. The label is as wide as the view and centred, so the target is narrowed to
@@ -147,12 +189,13 @@ static BOOL setText(UILabel *label, NSString *text) {
 
 - (CGFloat)contentHeightForWidth:(CGFloat)width {
     CGFloat text = MAX(0, width - 2 * kSide), height = 0;
-    UILabel *previous = nil;
-    for (UILabel *label in @[_title, _creator, _length]) {
-        if (label.hidden) continue;
-        if (previous) height += previous == _creator ? 4 : 2;
-        height += ceil([label sizeThatFits:CGSizeMake(text, CGFLOAT_MAX)].height);
-        previous = label;
+    UIView *previous = nil;
+    for (UIView *line in @[_logo, _title, _creator, _length]) {
+        if (line.hidden) continue;
+        if (previous) height += previous == _creator ? 4 : previous == _logo ? 8 : 2;
+        height += line == _logo ? [self sgr_logoSizeForText:text].height
+                                : ceil([line sizeThatFits:CGSizeMake(text, CGFLOAT_MAX)].height);
+        previous = line;
     }
     if (previous) height += kRowAbove;
     height += SGRActionHeight;
@@ -165,14 +208,20 @@ static BOOL setText(UILabel *label, NSString *text) {
     CGFloat width = self.bounds.size.width, text = MAX(0, width - 2 * kSide);
     CGFloat y = round(self.bounds.size.height - SGRHeaderInfoBottom - [self contentHeightForWidth:width]);
 
-    UILabel *previous = nil;
-    for (UILabel *label in @[_title, _creator, _length]) {
-        if (label.hidden) continue;
-        if (previous) y += previous == _creator ? 4 : 2;
-        CGFloat height = ceil([label sizeThatFits:CGSizeMake(text, CGFLOAT_MAX)].height);
-        label.frame = CGRectMake(kSide, y, text, height);
-        y += height;
-        previous = label;
+    UIView *previous = nil;
+    for (UIView *line in @[_logo, _title, _creator, _length]) {
+        if (line.hidden) continue;
+        if (previous) y += previous == _creator ? 4 : previous == _logo ? 8 : 2;
+        if (line == _logo) {
+            CGSize logo = [self sgr_logoSizeForText:text];
+            line.frame = CGRectMake(round((width - logo.width) / 2), y, logo.width, logo.height);
+            y += logo.height;
+        } else {
+            CGFloat height = ceil([line sizeThatFits:CGSizeMake(text, CGFLOAT_MAX)].height);
+            line.frame = CGRectMake(kSide, y, text, height);
+            y += height;
+        }
+        previous = line;
     }
     if (previous) y += kRowAbove;
 

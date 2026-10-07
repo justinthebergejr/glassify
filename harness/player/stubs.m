@@ -79,6 +79,14 @@ void SGRPlayerVanish(UIView *view) {
     view.accessibilityElementsHidden = YES;
 }
 
+#pragma mark - Redesigned/Player/PlayerLiveCover.x
+
+// No clips are looked up; the cover shows, as for a track with none.
+@class SGRArtworkField;
+void SGRPlayerLiveCoverLayIn(SGRArtworkField *field) {}
+void SGRPlayerLiveCoverRefresh(void) {}
+UIImage *SGRPlayerLiveCoverFrame(NSString **identity) { return nil; }
+
 #pragma mark - Shared/Haptics
 
 void SGPlayFeedback(NSInteger feedback) {}
@@ -87,7 +95,7 @@ void SGPrepareFeedback(NSInteger feedback) {}
 #pragma mark - Shared/LyricsSources
 
 NSString *SGLyricsCreditFor(NSString *trackID) { return @"the harness"; }
-BOOL SGLyricsCreditRequired(NSString *credit, NSURL **link) { return NO; }
+BOOL SGLyricsCreditRequired(NSString *credit, NSArray<NSDictionary *> **links) { return NO; }
 
 #pragma mark - Shared/LyricsMeanings, Redesigned/Lyrics/MeaningSheet
 
